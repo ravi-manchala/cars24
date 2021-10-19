@@ -1,0 +1,28 @@
+.nav {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  height: 70px;
+  padding: 0 30px;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  z-index: 1;
+}
+
+.nav ul {
+  display: flex;
+}
+
+.nav ul li {
+  list-style: none;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+}
