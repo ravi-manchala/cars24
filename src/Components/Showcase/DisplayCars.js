@@ -23,7 +23,7 @@ const DisplayCars = () => {
   }, []);
 
   return (
-    <div style={{ marginTop: "60px" }} className={classes.container}>
+    <div className={classes.container}>
       <h3>Used cars in Dubai</h3>
       <InfiniteScroll pageStart={0} loadMore={getData} hasMore={true || false}>
         {data.map((img) => {
@@ -38,16 +38,38 @@ const DisplayCars = () => {
                 {img.year} {img.make} {img.model}
               </h4>
               <p>
-                <strong>
-                  {img.variant} {img.engineSize}L{" "}
-                </strong>
+                <strong className={classes.line}>{img.variant} </strong>
                 {img.specs} specification
               </p>
-              <img
-                src="https://consumer-web-ae.qac24svc.dev/ae/static/js/15bbe7d4f9e51f5043535857c52d7336.svg"
-                alt="Kilometer Icon"
-              ></img>
-              <span> {img.odometerReading} km</span>
+              <div className={classes.speedmeter}>
+                <img
+                  src="https://consumer-web-ae.qac24svc.dev/ae/static/js/15bbe7d4f9e51f5043535857c52d7336.svg"
+                  alt="Kilometer Icon"
+                ></img>
+                <span> {img.odometerReading} km</span>
+
+                <img
+                  className={classes.turbo}
+                  src="https://consumer-web-ae.qac24svc.dev/ae/static/js/5570637da94bead30f0c65f9faca1c5e.svg"
+                  alt="Turbo Icon"
+                ></img>
+                <span>
+                  {img.noOfCylinders}cyl{img.engineSize}L
+                </span>
+              </div>
+              {/* <hr></hr> */}
+              <div className={classes.emi}>
+                <div className={classes.emimonthly}>
+                  <h4>AED {img.emiDetails.emi}/month</h4>
+                  <p>AED {img.downPayment} downpayment</p>
+                </div>
+                <div>
+                  <h4>AED {img.price}</h4>
+                  <p>
+                    <del>AED {img.discountAmount}</del>
+                  </p>
+                </div>
+              </div>
             </div>
           );
         })}
