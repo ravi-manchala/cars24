@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Axios from "axios";
 import classes from "./DisplayCars.module.css";
 import InfiniteScroll from "react-infinite-scroller";
+import Card from "./Card";
 
 const DisplayCars = () => {
   const [data, setData] = useState([]);
@@ -18,60 +19,18 @@ const DisplayCars = () => {
     });
   };
 
-  useEffect(() => {
-    getData();
-  }, []);
-
   return (
     <div className={classes.container}>
-      <h3>Used cars in Dubai</h3>
-      <InfiniteScroll pageStart={0} loadMore={getData} hasMore={true || false}>
-        {data.map((img) => {
-          return (
-            <div key={img.appointmentId} className={classes.card}>
-              <img
-                className={classes.image}
-                src={`https://fastly-production.24c.in/${img.mainImage.path}`}
-                alt={img.mainImage.label}
-              />
-              <h4>
-                {img.year} {img.make} {img.model}
-              </h4>
-              <p>
-                <strong className={classes.line}>{img.variant} </strong>
-                {img.specs} specification
-              </p>
-              <div className={classes.speedmeter}>
-                <img
-                  src="https://consumer-web-ae.qac24svc.dev/ae/static/js/15bbe7d4f9e51f5043535857c52d7336.svg"
-                  alt="Kilometer Icon"
-                ></img>
-                <span> {img.odometerReading} km</span>
+      <div className={classes.headers}>
+        <h3>Used Cars in Dubai</h3>
+        <h3>
+          <span>Change</span>
+        </h3>
+      </div>
 
-                <img
-                  className={classes.turbo}
-                  src="https://consumer-web-ae.qac24svc.dev/ae/static/js/5570637da94bead30f0c65f9faca1c5e.svg"
-                  alt="Turbo Icon"
-                ></img>
-                <span>
-                  {img.noOfCylinders}cyl{img.engineSize}L
-                </span>
-              </div>
-              {/* <hr></hr> */}
-              <div className={classes.emi}>
-                <div className={classes.emimonthly}>
-                  <h4>AED {img.emiDetails.emi}/month</h4>
-                  <p>AED {img.downPayment} downpayment</p>
-                </div>
-                <div>
-                  <h4>AED {img.price}</h4>
-                  <p>
-                    <del>AED {img.discountAmount}</del>
-                  </p>
-                </div>
-              </div>
-            </div>
-          );
+      <InfiniteScroll pageStart={0} loadMore={getData} hasMore={hasMore}>
+        {data.map((card) => {
+          return <Card key={card.appointmentId} card={card} />;
         })}
       </InfiniteScroll>
     </div>

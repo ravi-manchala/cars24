@@ -1,0 +1,76 @@
+.card {
+  width: 100%;
+  margin-bottom: 20px;
+  box-shadow: 0px 2px 3px 3px #f0eded;
+  border-radius: 10px 10px 10px 10px;
+}
+
+.carimage {
+  width: 100%;
+  height: auto;
+  border-radius: 10px 10px 0 0;
+}
+
+.cardetails {
+  padding: 0 20px;
+  border-radius: 0 0 10px 10px;
+}
+
+.specification {
+  border-bottom: 1px solid #dfdbdb;
+}
+
+.likebtn {
+  margin: 12px 0;
+  font-size: 18px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.specification > p {
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.specification > p > strong {
+  font-weight: 650;
+  border-right: 3px solid #d0cdcd;
+  padding-right: 3px;
+}
+
+.specification > p > span {
+  padding-left: 5px;
+}
+
+.speedmeter {
+  display: flex;
+  align-items: center;
+  font-weight: 300;
+  margin: 15px 0;
+}
+
+.turbo {
+  padding-left: 50px;
+}
+
+.emi {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+}
+
+.emi h4 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.emi p {
+  font-size: small;
+  margin-bottom: 15px;
+}
+
+.emimonthly h4 {
+  color: #ef7e2b;
+}
