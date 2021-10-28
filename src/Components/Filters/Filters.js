@@ -1,43 +1,10 @@
-import React, { useState, useEffect } from "react";
-import Axios from "axios";
+import React, { useState } from "react";
 import classes from "./Filters.module.css";
 
-const arr = [
-  "make",
-  "quotedPrice",
-  "year",
-  "bodyType",
-  "odometerReading",
-  "carColor",
-  "fuelType",
-  "transmissionType",
-  "optionsType",
-  "engine",
-  "doorsAndSeats",
-  "discount",
-];
-
-const Filters = () => {
-  const [options, setOptions] = useState([]);
+const Filters = (props) => {
+  const { options } = props;
   const [bucketData, setBucketData] = useState();
   const [suggestions, setSuggestions] = useState();
-
-  const fetchData = () => {
-    Axios.get(
-      "https://listing-service.qac24svc.dev/v1/filter?&variant=filterV3",
-      { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
-    ).then((response) => {
-      // console.log(response);
-      const result = arr.map((ele) => {
-        return response.data.filters[ele];
-      });
-      setOptions(result);
-    });
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   // console.log(options);
 
@@ -60,70 +27,61 @@ const Filters = () => {
         <p>Filters</p>
       </div>
       <div className={classes.optionsForm}>
-        <div>
+        <div className={classes.options}>
           {options.map((option, index) => {
             return (
-              <div key={option.name} className={classes.options}>
+              <div key={option.name} className={classes.optionBtn}>
                 <p onClick={() => getBuckets(index)}>{option.displayName}</p>
               </div>
             );
           })}
         </div>
-        {/* <div className={classes.searchfield}>
-          <img
-            src="https://consumer-web-ae.qac24svc.dev/ae/static/js/7a474f42e85666256164022bf2d3c604.svg"
-            alt="search"
-          />
-          <input type="text" placeholder="Search by Brand or Model" />
-        </div> */}
-        <div className={classes.suggestions}>
-          {suggestions &&
-            suggestions.map((suggestion) => {
-              return (
-                <div>
-                  {suggestion.subFacet &&
-                    suggestion.subFacet.buckets.map((model) => {
-                      return (
-                        <div key={model.name}>
-                          {/* <h6>
-                            {suggestion.name} {model.name}
-                          </h6> */}
-                          <label htmlFor={model.name} />
-                          <input
-                            type="checkbox"
-                            name={model.name}
-                            id={model.name}
-                          />
-                          {suggestion.name}
-                          {model.name}
-                        </div>
-                      );
-                    })}
-                  {/* <h6>{suggestion.name}</h6> */}
+        <div className={classes.suggestions_bucketData}>
+          <div>
+            {suggestions &&
+              suggestions.map((suggestion) => {
+                return (
                   <div>
-                    <label htmlFor={suggestion.name} />
-                    <input
-                      type="checkbox"
-                      name={suggestion.name}
-                      id={suggestion.name}
-                    />
-                    {suggestion.name}
+                    {suggestion.subFacet &&
+                      suggestion.subFacet.buckets.map((model) => {
+                        return (
+                          <div key={model.name}>
+                            <label htmlFor={model.name} />
+                            <input
+                              type="checkbox"
+                              name={model.name}
+                              id={model.name}
+                            />
+                            {suggestion.name}
+                            {model.name}
+                          </div>
+                        );
+                      })}
+                    <div>
+                      <label htmlFor={suggestion.name} />
+                      <input
+                        type="checkbox"
+                        name={suggestion.name}
+                        id={suggestion.name}
+                      />
+                      {suggestion.name}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-        </div>
-        <div>
-          {bucketData &&
-            bucketData.map((ele) => {
-              return (
-                <div>
-                  <label htmlFor={ele.name} />
-                  <input type="checkbox" name={ele.name} id={ele.name} />
-                  {ele.name}
-                </div>
-              );
-            })}
+                );
+              })}
+          </div>
+          <div>
+            {bucketData &&
+              bucketData.map((ele) => {
+                return (
+                  <div>
+                    <label htmlFor={ele.name} />
+                    <input type="checkbox" name={ele.name} id={ele.name} />
+                    {ele.name}
+                  </div>
+                );
+              })}
+          </div>
         </div>
       </div>
       <div className={classes.btns}>
@@ -143,5 +101,3 @@ const Filters = () => {
 };
 
 export default Filters;
-
-//

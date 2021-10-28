@@ -19,3 +19,36 @@
 .headers > h3 > span {
   color: #ef7e2b;
 }
+
+.options {
+  display: flex;
+  padding: 10px 0;
+  overflow: scroll;
+}
+
+.optionBtn {
+  border: 1px solid #dde5eb;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 300;
+  padding: 6px 12px;
+  background: #fff;
+  margin-right: 5px;
+  white-space: nowrap;
+}
+
+.optionBtn p {
+  display: flex;
+  align-items: center;
+}
+
+.optionBtn img {
+  transform: rotate(90deg);
+  margin-left: 10px;
+}
+
+.modal {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}

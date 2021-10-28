@@ -13,8 +13,8 @@
   padding: 10px 15px;
   position: fixed;
   top: 0;
-  z-index: 10;
   border-bottom: 1px solid #dfdbdb;
+  z-index: 0;
 }
 
 .logo {
