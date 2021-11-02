@@ -25,12 +25,14 @@ const arr = [
 const DisplayCars = () => {
   // Used cars data API state
   const [data, setData] = useState([]);
-  const [hasMore, setHasmore] = useState(true);
+  const [selectedFilters, setSelectedFilters] = useState({});
 
   //Fiilter Data API state
-  const [options, setOptions] = useState([]);
+  const [filters, setFilters] = useState([]);
 
+  //modal state
   const [filtersCompOpen, setFiltersCompOpen] = useState(false);
+  const [hasMore, setHasmore] = useState(true);
 
   //Used cars data API call
   const usedCarsData = (page) => {
@@ -45,38 +47,65 @@ const DisplayCars = () => {
     });
   };
 
+  const getCount = (data) => {
+    const newData = {
+      ...selectedFilters,
+      [data.name]: data.values,
+    };
+    let paramString = "sf=";
+    Object.keys(newData).map((key) => {
+      paramString += `${key}:`;
+      newData[key].map((value) => {
+        paramString += `${value.name}-sub-model:`;
+        paramString += value.models.join(";");
+      });
+    });
+    Axios.get(
+      `https://listing-service.qac24svc.dev/v1/vehicle?sf=city:DU_DUBAI&size=0&spath=buy-used-cars-dubai&variant=filterV3&page=0&${paramString}`,
+      { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
+    ).then((resp) => {
+      // console.log(resp.data);
+    });
+  };
+
   //Filters API call
-  const fetchData = () => {
+  const filterData = () => {
     Axios.get(
       "https://listing-service.qac24svc.dev/v1/filter?&variant=filterV3",
       { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
     ).then((response) => {
-      // console.log(response);
+      // console.log(response.data.filters);
       const result = arr.map((ele) => {
         return response.data.filters[ele];
       });
-      setOptions(result);
+      setFilters(result);
     });
   };
 
+  console.log(filters);
+
   useEffect(() => {
-    fetchData();
+    filterData();
   }, []);
 
-  // console.log(options);
+  // console.log(filters);
 
-  const filterOpen = () => {
+  const filter_modal_Open = () => {
     setFiltersCompOpen(true);
+  };
+
+  const filter_modal_Close = () => {
+    setFiltersCompOpen(false);
   };
 
   return (
     <div className={classes.container}>
       <div className={classes.options}>
-        {options.map((option, index) => {
+        {filters.map((option, index) => {
           return (
             <div key={option.name} className={classes.optionBtn}>
-              <p>
-                <span onClick={filterOpen}>{option.displayName}</span>
+              <p onClick={filter_modal_Open}>
+                <span>{option.displayName}</span>
                 <img
                   src="https://consumer-web-ae.qac24svc.dev/ae/static/js/6fae39b71885d4edcd60fe0f00851390.svg"
                   alt="arrow"
@@ -96,10 +125,15 @@ const DisplayCars = () => {
       <Modal
         className={classes.modal}
         isOpen={filtersCompOpen}
-        onRequestClose={() => setFiltersCompOpen(false)}
+        // onRequestClose={() => setFiltersCompOpen(false)}
         ariaHideApp={false}
       >
-        <Filters options={options} />
+        <Filters
+          selectedFilters={selectedFilters}
+          getCount={getCount}
+          filters={filters}
+          filter_modal_Close={filter_modal_Close}
+        />
       </Modal>
 
       <InfiniteScroll pageStart={0} loadMore={usedCarsData} hasMore={hasMore}>

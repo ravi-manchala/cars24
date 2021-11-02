@@ -2,25 +2,43 @@ import React, { useState } from "react";
 import classes from "./Filters.module.css";
 
 const Filters = (props) => {
-  const { options } = props;
+  const { filters, filter_modal_Close } = props;
   const [bucketData, setBucketData] = useState();
   const [suggestions, setSuggestions] = useState();
+  const [selectedFacet, setSelectedFacet] = useState("");
 
-  // console.log(options);
+  // selected car count state
+  // const [count, setCount] = useState(initialCount);
 
-  const getBuckets = (id) => {
-    // console.log(id);
-    setBucketData(options[id].buckets);
-    setSuggestions(options[id].suggestions);
+  const getBuckets = (name, index) => {
+    setSelectedFacet(name);
+    setBucketData(filters[index].buckets);
+    setSuggestions(filters[index].suggestions);
   };
 
+  // console.log(filters);
   // console.log(suggestions);
-  // console.log(bucketData);
+  console.log(bucketData);
+
+  const selectedCarCount = (option, eve) => {
+    const { name, checked } = eve.target;
+    console.log(name, checked);
+    props.getCount({
+      name: selectedFacet,
+      values: [
+        {
+          name: option.name,
+          models: option.subFacet.buckets.map((val) => val.name),
+        },
+      ],
+    });
+  };
 
   return (
     <div>
       <div className={classes.heading}>
         <img
+          onClick={filter_modal_Close}
           src="https://consumer-web-ae.qac24svc.dev/ae/static/js/8e795214a56ae869b2f276365fe7eca0.svg"
           alt="close"
         ></img>
@@ -28,10 +46,12 @@ const Filters = (props) => {
       </div>
       <div className={classes.optionsForm}>
         <div className={classes.options}>
-          {options.map((option, index) => {
+          {filters.map((option, index) => {
             return (
               <div key={option.name} className={classes.optionBtn}>
-                <p onClick={() => getBuckets(index)}>{option.displayName}</p>
+                <p onClick={() => getBuckets(option.name, index)}>
+                  {option.displayName}
+                </p>
               </div>
             );
           })}
@@ -41,19 +61,21 @@ const Filters = (props) => {
             {suggestions &&
               suggestions.map((suggestion) => {
                 return (
-                  <div>
+                  <div key={suggestion.name}>
                     {suggestion.subFacet &&
                       suggestion.subFacet.buckets.map((model) => {
                         return (
                           <div key={model.name}>
-                            <label htmlFor={model.name} />
                             <input
                               type="checkbox"
                               name={model.name}
                               id={model.name}
                             />
-                            {suggestion.name}
-                            {model.name}
+                            <label htmlFor={model.name}>
+                              {" "}
+                              {suggestion.name}
+                              {model.name}
+                            </label>
                           </div>
                         );
                       })}
@@ -64,20 +86,50 @@ const Filters = (props) => {
                         name={suggestion.name}
                         id={suggestion.name}
                       />
-                      {suggestion.name}
+                      <span>{suggestion.name}</span>
                     </div>
                   </div>
                 );
               })}
           </div>
           <div>
+            {/* <h4 className={classes.all_brand_heading}>All Brands</h4> */}
             {bucketData &&
-              bucketData.map((ele) => {
+              bucketData.map((ele, index) => {
                 return (
-                  <div>
-                    <label htmlFor={ele.name} />
-                    <input type="checkbox" name={ele.name} id={ele.name} />
-                    {ele.name}
+                  <div className={classes.brand_modal_name} key={ele.name}>
+                    <div className={classes.car_brand_name}>
+                      <input
+                        type="checkbox"
+                        name={ele.name}
+                        id={ele.name}
+                        onClick={(eve) => selectedCarCount(ele, eve)}
+                      />
+                      <label htmlFor={ele.name}> {ele.name}</label>
+                    </div>
+                    <div>
+                      {ele.subFacet &&
+                        ele.subFacet.buckets.map((subele) => {
+                          return (
+                            <div
+                              key={subele.name}
+                              className={classes.car_modal_name}
+                            >
+                              <input
+                                type="checkbox"
+                                id={subele.name}
+                                name={subele.name}
+                                // checked={
+                                //   props.selectedFilters &&
+                                //   props.selectedFilters[ele.name] &&
+                                //   props.selectedFilters[ele.name]
+                                // }
+                              />
+                              <label htmlFor={subele.name}>{subele.name}</label>
+                            </div>
+                          );
+                        })}
+                    </div>
                   </div>
                 );
               })}
@@ -92,7 +144,7 @@ const Filters = (props) => {
         </div>
         <div>
           <button className={classes.showcarsbtn}>
-            <span>SHOW CARS</span>
+            <span>SHOW 0 CARS</span>
           </button>
         </div>
       </div>
