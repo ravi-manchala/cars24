@@ -31,44 +31,85 @@ const DisplayCars = () => {
 
   //modal state
   const [filtersCompOpen, setFiltersCompOpen] = useState(false);
-  const [hasMore, setHasmore] = useState(true);
+  const [hasMore, setHasmore] = useState(false);
 
-  const [selectedFilters, setSelectedFilters] = useState([]);
-
+  const [seleFilter, setSeleFilter] = useState({});
   //Used cars data API call
   const usedCarsData = (page) => {
     Axios.get(
       `https://listing-service.qac24svc.dev/v1/vehicle?sf=city:DU_DUBAI&size=25&spath=buy-used-cars-dubai&variant=filterV3&page=${page}`,
       { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
     ).then((resp) => {
+      setData([...data, ...resp.data.results]);
       if (resp.data.results.length < 25) {
         setHasmore(false);
+      } else if (!hasMore) {
+        setHasmore(true);
       }
-      setData([...data, ...resp.data.results]);
     });
   };
 
-  // const getCount = (data) => {
-  //   const newData = {
-  //     ...selectedFilters,
-  //     [data.name]: data.values,
-  //   };
-  //   setSelectedFilters(newData);
-  //   let paramString = "sf=";
-  //   Object.keys(newData).map((key) => {
-  //     paramString += `${key}:`;
-  //     newData[key].map((value) => {
-  //       paramString += `${value.name}-sub-model:`;
-  //       paramString += value.models.join(";");
-  //     });
-  //   });
-  //   Axios.get(
-  //     `https://listing-service.qac24svc.dev/v1/vehicle?sf=city:DU_DUBAI&size=0&spath=buy-used-cars-dubai&variant=filterV3&page=0&${paramString}`,
-  //     { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
-  //   ).then((resp) => {
-  //     // console.log(resp.data);
-  //   });
-  // };
+  const getCount = (data) => {
+    // console.log(data);
+    if (data.values) {
+      let newData = {};
+      if (seleFilter[data.name]) {
+        newData = {
+          ...seleFilter,
+          [data.name]: [...seleFilter[data.name], ...data.values],
+        };
+      } else {
+        newData = {
+          ...seleFilter,
+          [data.name]: data.values,
+        };
+      }
+      setSeleFilter(newData);
+      let paramString = "sf=";
+      Object.keys(newData).map((key) => {
+        paramString += `${key}:`;
+        newData[key].map((value) => {
+          paramString += `${value.name}-sub-model:`;
+          paramString += value.models.join(";");
+        });
+      });
+
+      Axios.get(
+        `https://listing-service.qac24svc.dev/v1/vehicle?sf=city:DU_DUBAI&size=0&spath=buy-used-cars-dubai&variant=filterV3&page=0&${paramString}`,
+        { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
+      ).then((resp) => {
+        // console.log(resp.data);
+      });
+    } else {
+      const newData = {
+        ...seleFilter,
+        [data.name]: data.model,
+      };
+      setSeleFilter(newData);
+    }
+    // const newData = {
+    //   ...setSeleFilter,
+    //   [data.name]: data.values,
+    // };
+    // setSeleFilter(newData);
+    // console.log(newData);
+    // let paramString = "sf=";
+    // Object.keys(newData).map((key) => {
+    //   paramString += `${key}:`;
+    //   newData[key].map((value) => {
+    //     paramString += `${value.name}-sub-model:`;
+    //     paramString += value.models.join(";");
+    //   });
+    // });
+    // console.log(paramString);
+    // Axios.get(
+    //   `https://listing-service.qac24svc.dev/v1/vehicle?sf=city:DU_DUBAI&size=0&spath=buy-used-cars-dubai&variant=filterV3&page=0&${paramString}`,
+    //   { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
+    // ).then((resp) => {
+    //   // console.log(resp.data);
+    // });
+  };
+  // console.log(seleFilter);
 
   //Filters API call
   const filterData = () => {
@@ -86,22 +127,33 @@ const DisplayCars = () => {
 
   // console.log(filters);
 
-  const suggestionsUrlHandler = (urlData) => {
-    let paramStaring = `${urlData.filterType}=${urlData.name}:${urlData.min};${urlData.max}`;
-    // console.log(paramStaring);
-    setSelectedFilters([...selectedFilters, paramStaring]);
+  const suggestionsUrlHandler = (selectedFilters) => {
+    console.log(selectedFilters);
+    console.log(Object.keys(selectedFilters));
+    const urlArray = [];
+    Object.keys(selectedFilters).map((selectedFilter) => {
+      // console.log(selectedFilters[selectedFilter]);
+      let filterType = selectedFilters[selectedFilter].filterType;
+      let name = selectedFilters[selectedFilter].name;
+      let min = selectedFilters[selectedFilter].min;
+      let max = selectedFilters[selectedFilter].max;
+      let paramStaring = `${filterType}=${name}:${min};${max}`;
+      return urlArray.push(paramStaring);
+    });
+    // console.log(urlArray);
+    let urlString = urlArray.join("&");
+
     Axios.get(
-      `https://listing-service.qac24svc.dev/v1/vehicle?${paramStaring}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
+      `https://listing-service.qac24svc.dev/v1/vehicle?${urlString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
       { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
     ).then((response) => {
-      console.log(response);
+      // console.log(response);
     });
   };
 
-  console.log(selectedFilters);
-
   useEffect(() => {
     filterData();
+    usedCarsData(0);
   }, []);
 
   const filter_modal_Open = () => {
@@ -114,8 +166,8 @@ const DisplayCars = () => {
 
   return (
     <div className={classes.container}>
-      <div className={classes.options}>
-        {filters.map((option, index) => {
+      <div className={classes.options} style={{ height: "60px" }}>
+        {filters.map((option) => {
           return (
             <div key={option.name} className={classes.optionBtn}>
               <p onClick={filter_modal_Open}>
@@ -139,15 +191,13 @@ const DisplayCars = () => {
       <Modal
         className={classes.modal}
         isOpen={filtersCompOpen}
-        // onRequestClose={() => setFiltersCompOpen(false)}
         ariaHideApp={false}
       >
         <Filters
-          // selectedFilters={selectedFilters}
-          // getCount={getCount}
           filters={filters}
           filter_modal_Close={filter_modal_Close}
           suggestionsUrlHandler={suggestionsUrlHandler}
+          getCount={getCount}
         />
       </Modal>
 

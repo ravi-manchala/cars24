@@ -8,6 +8,7 @@ const Filters = (props) => {
   const [filterType, setFilterType] = useState("");
   const [suggestionData, setSuggestionsData] = useState();
   const [bucketData, setBucketData] = useState();
+  const [selectedFilters, setSelectedFilters] = useState({});
 
   const optionsData = (index) => {
     setOptionName(filters[index].name);
@@ -18,19 +19,44 @@ const Filters = (props) => {
 
   // console.log(filters);
   // console.log(filterType);
-  console.log(suggestionData);
+  // console.log(optionName);
+  // console.log(filterType);
+  // console.log(suggestionData);
   // console.log(bucketData);
 
   const suggestionUrlData = (index, filterType) => {
-    const urlData = {
-      filterType: filterType,
-      name: optionName,
-      min: suggestionData[index].min,
-      max: suggestionData[index].max,
+    const newData = {
+      ...selectedFilters,
+      [optionName]: {
+        filterType: filterType,
+        name: optionName,
+        min: suggestionData[index].min,
+        max: suggestionData[index].max,
+      },
     };
-    // console.log(min, max, name, filterType);
-    // props.suggestionsUrlHandler(min, max, name, filterType);
-    props.suggestionsUrlHandler(urlData);
+    setSelectedFilters(newData);
+    props.suggestionsUrlHandler(newData);
+  };
+  // console.log(selectedFilters);
+
+  const checkboxUrldata = (brandname) => {
+    // console.log(brandname);
+    if (brandname.subFacet) {
+      props.getCount({
+        name: optionName,
+        values: [
+          {
+            name: brandname.name,
+            models: brandname.subFacet.buckets.map((val) => val.name),
+          },
+        ],
+      });
+    } else {
+      props.getCount({
+        name: optionName,
+        model: brandname.name,
+      });
+    }
   };
 
   return (
@@ -62,7 +88,6 @@ const Filters = (props) => {
                   <div key={suggestion.name}>
                     <input
                       type="radio"
-                      // name={suggestion.name}
                       name="suggestion"
                       id={suggestion.name}
                       value={suggestion.name}
@@ -113,6 +138,7 @@ const Filters = (props) => {
                         id={brandName.name}
                         name={brandName.name}
                         value={brandName.name}
+                        onChange={() => checkboxUrldata(brandName)}
                       />
                       <label htmlFor={brandName.name}>{brandName.name}</label>
                     </div>
@@ -144,6 +170,18 @@ const Filters = (props) => {
                 );
               })}
           </div>
+        </div>
+      </div>
+      <div className={classes.btns}>
+        <div>
+          <button className={classes.clearbtn}>
+            <span>CLEAR ALL</span>
+          </button>
+        </div>
+        <div>
+          <button className={classes.showcarsbtn}>
+            <span>SHOW 0 CARS</span>
+          </button>
         </div>
       </div>
     </div>
@@ -289,19 +327,19 @@ export default Filters;
 //           </div>
 //         </div>
 //       </div>
-//       <div className={classes.btns}>
-//         <div>
-//           <button className={classes.clearbtn}>
-//             <span>CLEAR ALL</span>
-//           </button>
-//         </div>
-//         <div>
-//           <button className={classes.showcarsbtn}>
-//             <span>SHOW 0 CARS</span>
-//           </button>
-//         </div>
-//       </div>
-//     </div>
+//  <div className={classes.btns}>
+//    <div>
+//      <button className={classes.clearbtn}>
+//        <span>CLEAR ALL</span>
+//      </button>
+//    </div>
+//    <div>
+//      <button className={classes.showcarsbtn}>
+//        <span>SHOW 0 CARS</span>
+//      </button>
+//    </div>
+//  </div>
+//  </div>
 //   );
 // };
 
