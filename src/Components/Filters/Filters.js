@@ -42,7 +42,7 @@ const Filters = (props) => {
   const checkboxUrldata = (brandname) => {
     // console.log(brandname);
     if (brandname.subFacet) {
-      props.getCount({
+      props.checkBoxUrl({
         name: optionName,
         values: [
           {
@@ -52,7 +52,7 @@ const Filters = (props) => {
         ],
       });
     } else {
-      props.getCount({
+      props.checkBoxUrl({
         name: optionName,
         model: brandname.name,
       });
@@ -189,158 +189,3 @@ const Filters = (props) => {
 };
 
 export default Filters;
-
-// ******************************************************************************************************************************************************************************************* //
-
-// const Filters = (props) => {
-//   const { filters, filter_modal_Close } = props;
-//   const [bucketData, setBucketData] = useState();
-//   const [suggestions, setSuggestions] = useState();
-// const [selectedFacet, setSelectedFacet] = useState("");
-
-//   // selected car count state
-//   // const [count, setCount] = useState(initialCount);
-
-//   const getBuckets = (name, index) => {
-//     setSelectedFacet(name);
-//     setBucketData(filters[index].buckets);
-//     setSuggestions(filters[index].suggestions);
-//   };
-
-//   // console.log(filters);
-//   // console.log(suggestions);
-//   console.log(bucketData);
-
-//   const selectedCarCount = (option, eve) => {
-//     const { name, checked } = eve.target;
-//     console.log(name, checked);
-//     props.getCount({
-//       name: selectedFacet,
-//       values: [
-//         {
-//           name: option.name,
-//           models: option.subFacet.buckets.map((val) => val.name),
-//         },
-//       ],
-//     });
-//   };
-
-//   return (
-//     <div>
-//       <div className={classes.heading}>
-//         <img
-//           onClick={filter_modal_Close}
-//           src="https://consumer-web-ae.qac24svc.dev/ae/static/js/8e795214a56ae869b2f276365fe7eca0.svg"
-//           alt="close"
-//         ></img>
-//         <p>Filters</p>
-//       </div>
-//       <div className={classes.optionsForm}>
-//         <div className={classes.options}>
-//           {filters.map((option, index) => {
-//             return (
-//               <div key={option.name} className={classes.optionBtn}>
-//                 <p onClick={() => getBuckets(option.name, index)}>
-//                   {option.displayName}
-//                 </p>
-//               </div>
-//             );
-//           })}
-//         </div>
-//         <div className={classes.suggestions_bucketData}>
-//           <div>
-//             {suggestions &&
-//               suggestions.map((suggestion) => {
-//                 return (
-//                   <div key={suggestion.name}>
-//                     {suggestion.subFacet &&
-//                       suggestion.subFacet.buckets.map((model) => {
-//                         return (
-//                           <div key={model.name}>
-//                             <input
-//                               type="checkbox"
-//                               name={model.name}
-//                               id={model.name}
-//                             />
-//                             <label htmlFor={model.name}>
-//                               {" "}
-//                               {suggestion.name}
-//                               {model.name}
-//                             </label>
-//                           </div>
-//                         );
-//                       })}
-//                     <div>
-//                       <label htmlFor={suggestion.name} />
-//                       <input
-//                         type="checkbox"
-//                         name={suggestion.name}
-//                         id={suggestion.name}
-//                       />
-//                       <span>{suggestion.name}</span>
-//                     </div>
-//                   </div>
-//                 );
-//               })}
-//           </div>
-//           <div>
-//             {/* <h4 className={classes.all_brand_heading}>All Brands</h4> */}
-//             {bucketData &&
-//               bucketData.map((ele, index) => {
-//                 return (
-//                   <div className={classes.brand_modal_name} key={ele.name}>
-//                     <div className={classes.car_brand_name}>
-//                       <input
-//                         type="checkbox"
-//                         name={ele.name}
-//                         id={ele.name}
-//                         onClick={(eve) => selectedCarCount(ele, eve)}
-//                       />
-//                       <label htmlFor={ele.name}> {ele.name}</label>
-//                     </div>
-//                     <div>
-//                       {ele.subFacet &&
-//                         ele.subFacet.buckets.map((subele) => {
-//                           return (
-//                             <div
-//                               key={subele.name}
-//                               className={classes.car_modal_name}
-//                             >
-//                               <input
-//                                 type="checkbox"
-//                                 id={subele.name}
-//                                 name={subele.name}
-//                                 // checked={
-//                                 //   props.selectedFilters &&
-//                                 //   props.selectedFilters[ele.name] &&
-//                                 //   props.selectedFilters[ele.name]
-//                                 // }
-//                               />
-//                               <label htmlFor={subele.name}>{subele.name}</label>
-//                             </div>
-//                           );
-//                         })}
-//                     </div>
-//                   </div>
-//                 );
-//               })}
-//           </div>
-//         </div>
-//       </div>
-//  <div className={classes.btns}>
-//    <div>
-//      <button className={classes.clearbtn}>
-//        <span>CLEAR ALL</span>
-//      </button>
-//    </div>
-//    <div>
-//      <button className={classes.showcarsbtn}>
-//        <span>SHOW 0 CARS</span>
-//      </button>
-//    </div>
-//  </div>
-//  </div>
-//   );
-// };
-
-// export default Filters;

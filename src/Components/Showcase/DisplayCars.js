@@ -49,68 +49,6 @@ const DisplayCars = () => {
     });
   };
 
-  const getCount = (data) => {
-    // console.log(data);
-    if (data.values) {
-      let newData = {};
-      if (seleFilter[data.name]) {
-        newData = {
-          ...seleFilter,
-          [data.name]: [...seleFilter[data.name], ...data.values],
-        };
-      } else {
-        newData = {
-          ...seleFilter,
-          [data.name]: data.values,
-        };
-      }
-      setSeleFilter(newData);
-      let paramString = "sf=";
-      Object.keys(newData).map((key) => {
-        paramString += `${key}:`;
-        newData[key].map((value) => {
-          paramString += `${value.name}-sub-model:`;
-          paramString += value.models.join(";");
-        });
-      });
-
-      Axios.get(
-        `https://listing-service.qac24svc.dev/v1/vehicle?sf=city:DU_DUBAI&size=0&spath=buy-used-cars-dubai&variant=filterV3&page=0&${paramString}`,
-        { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
-      ).then((resp) => {
-        // console.log(resp.data);
-      });
-    } else {
-      const newData = {
-        ...seleFilter,
-        [data.name]: data.model,
-      };
-      setSeleFilter(newData);
-    }
-    // const newData = {
-    //   ...setSeleFilter,
-    //   [data.name]: data.values,
-    // };
-    // setSeleFilter(newData);
-    // console.log(newData);
-    // let paramString = "sf=";
-    // Object.keys(newData).map((key) => {
-    //   paramString += `${key}:`;
-    //   newData[key].map((value) => {
-    //     paramString += `${value.name}-sub-model:`;
-    //     paramString += value.models.join(";");
-    //   });
-    // });
-    // console.log(paramString);
-    // Axios.get(
-    //   `https://listing-service.qac24svc.dev/v1/vehicle?sf=city:DU_DUBAI&size=0&spath=buy-used-cars-dubai&variant=filterV3&page=0&${paramString}`,
-    //   { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
-    // ).then((resp) => {
-    //   // console.log(resp.data);
-    // });
-  };
-  // console.log(seleFilter);
-
   //Filters API call
   const filterData = () => {
     Axios.get(
@@ -127,12 +65,86 @@ const DisplayCars = () => {
 
   // console.log(filters);
 
+  const checkBoxUrl = (data) => {
+    // console.log(data);
+    if (data.values) {
+      let newData = {};
+      if (seleFilter[data.name]) {
+        newData = {
+          ...seleFilter,
+          [data.name]: [...seleFilter[data.name], ...data.values],
+        };
+      } else {
+        newData = {
+          ...seleFilter,
+          [data.name]: data.values,
+        };
+      }
+      console.log(newData);
+      setSeleFilter(newData);
+      let paramString = "sf=";
+      Object.keys(newData).map((key) => {
+        paramString += `${key}:`;
+        let lastElement = newData[key][newData[key].length - 1];
+
+        newData[key].map((value) => {
+          paramString += `${value.name}-sub-model:`;
+          paramString += value.models.join(";");
+          if (value !== lastElement) {
+            paramString += `-or-${key}:`;
+          }
+        });
+      });
+      // console.log(paramString);
+
+      Axios.get(
+        `https://listing-service.qac24svc.dev/v1/vehicle?${paramString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
+        { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
+      ).then((resp) => {
+        // console.log(resp.data);
+      });
+    } else {
+      let newData = {};
+      if (seleFilter[data.name]) {
+        newData = {
+          ...seleFilter,
+          [data.name]: [...seleFilter[data.name], data.model],
+        };
+      } else {
+        newData = {
+          [data.name]: [data.model],
+        };
+      }
+      setSeleFilter(newData);
+      let paramString = "sf=";
+
+      Object.keys(newData).map((key) => {
+        let lastElement = newData[key][newData[key].length - 1];
+        paramString += `${key}:`;
+        newData[key].map((value) => {
+          paramString += value;
+          if (value !== lastElement) {
+            paramString += `-or-${key}:`;
+          }
+        });
+      });
+
+      // console.log(paramString);
+      Axios.get(
+        `https://listing-service.qac24svc.dev/v1/vehicle?${paramString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
+        { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
+      ).then((resp) => {
+        // console.log(resp.data);
+      });
+    }
+  };
+  console.log(seleFilter);
+
   const suggestionsUrlHandler = (selectedFilters) => {
-    console.log(selectedFilters);
-    console.log(Object.keys(selectedFilters));
+    // console.log(selectedFilters);
+    // console.log(Object.keys(selectedFilters));
     const urlArray = [];
     Object.keys(selectedFilters).map((selectedFilter) => {
-      // console.log(selectedFilters[selectedFilter]);
       let filterType = selectedFilters[selectedFilter].filterType;
       let name = selectedFilters[selectedFilter].name;
       let min = selectedFilters[selectedFilter].min;
@@ -140,8 +152,8 @@ const DisplayCars = () => {
       let paramStaring = `${filterType}=${name}:${min};${max}`;
       return urlArray.push(paramStaring);
     });
-    // console.log(urlArray);
     let urlString = urlArray.join("&");
+    console.log(urlString);
 
     Axios.get(
       `https://listing-service.qac24svc.dev/v1/vehicle?${urlString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
@@ -197,7 +209,7 @@ const DisplayCars = () => {
           filters={filters}
           filter_modal_Close={filter_modal_Close}
           suggestionsUrlHandler={suggestionsUrlHandler}
-          getCount={getCount}
+          checkBoxUrl={checkBoxUrl}
         />
       </Modal>
 
