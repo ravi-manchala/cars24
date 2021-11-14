@@ -8,7 +8,6 @@ const Filters = (props) => {
   const [filterType, setFilterType] = useState("");
   const [suggestionData, setSuggestionsData] = useState();
   const [bucketData, setBucketData] = useState();
-  const [selectedFilters, setSelectedFilters] = useState({});
 
   const optionsData = (index) => {
     setOptionName(filters[index].name);
@@ -25,24 +24,20 @@ const Filters = (props) => {
   // console.log(bucketData);
 
   const suggestionUrlData = (index, filterType) => {
-    const newData = {
-      ...selectedFilters,
-      [optionName]: {
+    props.suggestionsUrlHandler({
+      value: {
         filterType: filterType,
         name: optionName,
         min: suggestionData[index].min,
         max: suggestionData[index].max,
       },
-    };
-    setSelectedFilters(newData);
-    props.suggestionsUrlHandler(newData);
+    });
   };
-  // console.log(selectedFilters);
 
   const checkboxUrldata = (brandname) => {
     // console.log(brandname);
     if (brandname.subFacet) {
-      props.checkBoxUrl({
+      props.checkBoxUrlHandler({
         name: optionName,
         values: [
           {
@@ -52,11 +47,24 @@ const Filters = (props) => {
         ],
       });
     } else {
-      props.checkBoxUrl({
+      props.checkBoxUrlHandler({
         name: optionName,
         model: brandname.name,
       });
     }
+  };
+
+  const modelCheckBoxdata = (brandName, index) => {
+    // console.log(brandName.subFacet.buckets[index].name);
+    // props.modelCheckBoxUrlHandler({
+    //   name: optionName,
+    //   values: [
+    //     {
+    //       name: brandName.name,
+    //       modelName: brandName.subFacet.buckets[index].name,
+    //     },
+    //   ],
+    // });
   };
 
   return (
@@ -144,7 +152,7 @@ const Filters = (props) => {
                     </div>
                     <div>
                       {brandName.subFacet &&
-                        brandName.subFacet.buckets.map((model) => {
+                        brandName.subFacet.buckets.map((model, index) => {
                           return (
                             <div
                               key={model.name}
@@ -155,6 +163,9 @@ const Filters = (props) => {
                                 id={model.name}
                                 name={model.name}
                                 value={model.name}
+                                onChange={() =>
+                                  modelCheckBoxdata(brandName, index)
+                                }
                                 // checked={
                                 //   props.selectedFilters &&
                                 //   props.selectedFilters[ele.name] &&
@@ -180,7 +191,7 @@ const Filters = (props) => {
         </div>
         <div>
           <button className={classes.showcarsbtn}>
-            <span>SHOW 0 CARS</span>
+            <span>SHOW CARS</span>
           </button>
         </div>
       </div>

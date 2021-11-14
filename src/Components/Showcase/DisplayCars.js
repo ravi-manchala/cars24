@@ -33,7 +33,7 @@ const DisplayCars = () => {
   const [filtersCompOpen, setFiltersCompOpen] = useState(false);
   const [hasMore, setHasmore] = useState(false);
 
-  const [seleFilter, setSeleFilter] = useState({});
+  const [selectedFilter, setSelectedFilter] = useState({});
   //Used cars data API call
   const usedCarsData = (page) => {
     Axios.get(
@@ -65,103 +65,229 @@ const DisplayCars = () => {
 
   // console.log(filters);
 
-  const checkBoxUrl = (data) => {
+  const checkBoxUrlHandler = (data) => {
     // console.log(data);
     if (data.values) {
       let newData = {};
-      if (seleFilter[data.name]) {
+      if (selectedFilter[data.name]) {
         newData = {
-          ...seleFilter,
-          [data.name]: [...seleFilter[data.name], ...data.values],
+          ...selectedFilter,
+          [data.name]: [...selectedFilter[data.name], ...data.values],
         };
       } else {
         newData = {
-          ...seleFilter,
+          ...selectedFilter,
           [data.name]: data.values,
         };
       }
-      console.log(newData);
-      setSeleFilter(newData);
-      let paramString = "sf=";
-      Object.keys(newData).map((key) => {
-        paramString += `${key}:`;
-        let lastElement = newData[key][newData[key].length - 1];
+      setSelectedFilter(newData);
+      // let paramString = "sf=";
+      // Object.keys(newData).map((key) => {
+      //   paramString += `${key}:`;
+      //   let lastElement = newData[key][newData[key].length - 1];
 
-        newData[key].map((value) => {
-          paramString += `${value.name}-sub-model:`;
-          paramString += value.models.join(";");
-          if (value !== lastElement) {
-            paramString += `-or-${key}:`;
-          }
-        });
-      });
+      //   newData[key].map((value) => {
+      //     paramString += `${value.name}-sub-model:`;
+      //     paramString += value.models.join(";");
+      //     if (value !== lastElement) {
+      //       paramString += `-or-${key}:`;
+      //     }
+      //   });
+      // });
       // console.log(paramString);
 
-      Axios.get(
-        `https://listing-service.qac24svc.dev/v1/vehicle?${paramString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
-        { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
-      ).then((resp) => {
-        // console.log(resp.data);
-      });
+      // Axios.get(
+      //   `https://listing-service.qac24svc.dev/v1/vehicle?${paramString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
+      //   { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
+      // ).then((resp) => {
+      //   // console.log(resp.data);
+      // });
     } else {
       let newData = {};
-      if (seleFilter[data.name]) {
+      if (selectedFilter[data.name]) {
         newData = {
-          ...seleFilter,
-          [data.name]: [...seleFilter[data.name], data.model],
+          ...selectedFilter,
+          [data.name]: [...selectedFilter[data.name], data.model],
         };
       } else {
         newData = {
+          ...selectedFilter,
           [data.name]: [data.model],
         };
       }
-      setSeleFilter(newData);
-      let paramString = "sf=";
+      setSelectedFilter(newData);
+      // console.log(newData);
+      // let paramString = "sf=";
 
-      Object.keys(newData).map((key) => {
-        let lastElement = newData[key][newData[key].length - 1];
-        paramString += `${key}:`;
-        newData[key].map((value) => {
-          paramString += value;
-          if (value !== lastElement) {
-            paramString += `-or-${key}:`;
-          }
-        });
-      });
+      // Object.keys(newData).map((key) => {
+      //   let lastElement = newData[key][newData[key].length - 1];
+      //   paramString += `${key}:`;
+      //   newData[key].map((value) => {
+      //     paramString += value;
+      //     if (value !== lastElement) {
+      //       paramString += `-or-${key}:`;
+      //     }
+      //   });
+      // });
 
       // console.log(paramString);
-      Axios.get(
-        `https://listing-service.qac24svc.dev/v1/vehicle?${paramString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
-        { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
-      ).then((resp) => {
-        // console.log(resp.data);
-      });
+      // Axios.get(
+      //   `https://listing-service.qac24svc.dev/v1/vehicle?${paramString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
+      //   { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
+      // ).then((resp) => {
+      //   // console.log(resp.data);
+      // });
     }
+    // urlStringFunc(selectedFilter);
   };
-  console.log(seleFilter);
+  // console.log(selectedFilter);
 
-  const suggestionsUrlHandler = (selectedFilters) => {
-    // console.log(selectedFilters);
-    // console.log(Object.keys(selectedFilters));
-    const urlArray = [];
-    Object.keys(selectedFilters).map((selectedFilter) => {
-      let filterType = selectedFilters[selectedFilter].filterType;
-      let name = selectedFilters[selectedFilter].name;
-      let min = selectedFilters[selectedFilter].min;
-      let max = selectedFilters[selectedFilter].max;
-      let paramStaring = `${filterType}=${name}:${min};${max}`;
-      return urlArray.push(paramStaring);
-    });
-    let urlString = urlArray.join("&");
-    console.log(urlString);
+  const suggestionsUrlHandler = (data) => {
+    // console.log(data.value.name);
+    let newData = {
+      ...selectedFilter,
+      [data.value.name]: [data.value],
+    };
+    setSelectedFilter(newData);
+    // urlStringFunc();
 
-    Axios.get(
-      `https://listing-service.qac24svc.dev/v1/vehicle?${urlString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
-      { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
-    ).then((response) => {
-      // console.log(response);
-    });
+    // // console.log(newData);
+    // const urlArray = [];
+    // Object.keys(newData).map((key) => {
+    //   newData[key].map((value) => {
+    //     // console.log(value);
+    //     let filterType = value.filterType;
+    //     let name = value.name;
+    //     let min = value.min;
+    //     let max = value.max;
+    //     let paramStaring = `${filterType}=${name}:${min};${max}`;
+    //     return urlArray.push(paramStaring);
+    //   });
+    // });
+    // let urlString = urlArray.join("&");
+    // console.log(urlString);
+    // console.log(Object.keys(newData));
+    // const urlArray = [];
+    // Object.keys(selectedFilters).map((selectedFilter) => {
+    //   let filterType = selectedFilters[selectedFilter].filterType;
+    //   let name = selectedFilters[selectedFilter].name;
+    //   let min = selectedFilters[selectedFilter].min;
+    //   let max = selectedFilters[selectedFilter].max;
+    //   let paramStaring = `${filterType}=${name}:${min};${max}`;
+    //   return urlArray.push(paramStaring);
+    // });
+    // let urlString = urlArray.join("&");
+    // console.log(urlString);
+
+    // Axios.get(
+    //   `https://listing-service.qac24svc.dev/v1/vehicle?${urlString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
+    //   { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
+    // ).then((response) => {
+    //   // console.log(response);
+    // });
   };
+
+  // const modelCheckBoxUrlHandler = (data) => {
+  //   // console.log(data);
+  //   let newData = {};
+  //   if (selectedFilter[data.name]) {
+  //     newData = {
+  //       ...selectedFilter,
+  //       [data.name]: [...selectedFilter[data.name], ...data.values],
+  //     };
+  //   } else {
+  //     newData = {
+  //       ...selectedFilter,
+  //       [data.name]: data.values,
+  //     };
+  //   }
+  //   setSelectedFilter(newData);
+  // };
+
+  // console.log(selectedFilter);
+
+  // console.log(Object.keys(selectedFilter));
+  // const urlStringFunc = () => {
+  //   console.log(Object.keys(selectedFilter));
+  // };
+  let urlString = "";
+  Object.keys(selectedFilter).map((key) => {
+    if (key === "make") {
+      let paramString = "sf=";
+      paramString += `${key}:`;
+      let lastElement = selectedFilter[key][selectedFilter[key].length - 1];
+      selectedFilter[key].map((value) => {
+        paramString += `${value.name}-sub-model:`;
+        paramString += value.models.join(";");
+        if (value !== lastElement) {
+          paramString += `-or-${key}:`;
+        }
+      });
+      if (urlString) {
+        urlString += "&" + paramString;
+      } else {
+        urlString += paramString;
+      }
+
+      // console.log(paramString);
+    }
+    if (key === "quotedPrice" || key === "year" || key === "odometerReading") {
+      // const urlArray = [];
+      selectedFilter[key].map((value) => {
+        // console.log(value);
+        let filterType = value.filterType;
+        let name = value.name;
+        let min = value.min;
+        let max = value.max;
+        let paramString = `${filterType}=${name}:${min};${max}`;
+        // urlArray.push(paramStaring);
+        // urlString += paramStaring + "&";
+        if (urlString) {
+          urlString += "&" + paramString;
+        } else {
+          urlString += paramString;
+        }
+      });
+      // console.log(urlArray);
+      // let urlstring = urlArray.join("&");
+      // // console.log(urlstring);
+    }
+    if (
+      key === "bodyType" ||
+      key === "carColor" ||
+      key === "fuelType" ||
+      key === "optionsType" ||
+      key === "transmissionType"
+    ) {
+      let paramString = "";
+      let lastElement = selectedFilter[key][selectedFilter[key].length - 1];
+      paramString += `sf=${key}:`;
+      selectedFilter[key].map((value) => {
+        paramString += value;
+        if (value !== lastElement) {
+          paramString += `-or-${key}:`;
+        }
+      });
+      // console.log(paramString);
+      if (urlString) {
+        urlString += "&" + paramString;
+      } else {
+        urlString += paramString;
+      }
+    }
+  });
+  // if (urlString) {
+  //   console.log(urlString);
+  // }
+  // if (urlString) {
+  //   console.log("hello url exists");
+  //   Axios.get(
+  //     `https://listing-service.qac24svc.dev/v1/vehicle?${urlString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
+  //     { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
+  //   ).then((response) => {
+  //     // console.log(response);
+  //   });
+  // }
 
   useEffect(() => {
     filterData();
@@ -209,7 +335,8 @@ const DisplayCars = () => {
           filters={filters}
           filter_modal_Close={filter_modal_Close}
           suggestionsUrlHandler={suggestionsUrlHandler}
-          checkBoxUrl={checkBoxUrl}
+          checkBoxUrlHandler={checkBoxUrlHandler}
+          // modelCheckBoxUrlHandler={modelCheckBoxUrlHandler}
         />
       </Modal>
 
