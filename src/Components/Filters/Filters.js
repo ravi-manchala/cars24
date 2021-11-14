@@ -3,7 +3,7 @@ import classes from "./Filters.module.css";
 
 const Filters = (props) => {
   const { filters, filter_modal_Close } = props;
-  // console.log(filters);
+
   const [optionName, setOptionName] = useState("");
   const [filterType, setFilterType] = useState("");
   const [suggestionData, setSuggestionsData] = useState();
@@ -16,6 +16,17 @@ const Filters = (props) => {
     setBucketData(filters[index].buckets);
   };
 
+  // if (props.selectedFilter[optionName]) {
+  //   // console.log(props.selectedFilter[optionName]);
+  //   props.selectedFilter[optionName].map((brand) => {
+  //     // console.log(brand.name);
+  //     // console.log(brand.models);
+  //     brand.models.map((model) => {
+  //       console.log(model);
+  //     });
+  //   });
+  // }
+
   // console.log(filters);
   // console.log(filterType);
   // console.log(optionName);
@@ -26,6 +37,7 @@ const Filters = (props) => {
   const suggestionUrlData = (index, filterType) => {
     props.suggestionsUrlHandler({
       value: {
+        price: suggestionData[index].name,
         filterType: filterType,
         name: optionName,
         min: suggestionData[index].min,
@@ -55,6 +67,7 @@ const Filters = (props) => {
   };
 
   const modelCheckBoxdata = (brandName, index) => {
+    // console.log(brandName);
     // console.log(brandName.subFacet.buckets[index].name);
     // props.modelCheckBoxUrlHandler({
     //   name: optionName,
@@ -100,6 +113,13 @@ const Filters = (props) => {
                       id={suggestion.name}
                       value={suggestion.name}
                       onChange={() => suggestionUrlData(index, filterType)}
+                      checked={
+                        props.selectedFilter &&
+                        props.selectedFilter[optionName] &&
+                        props.selectedFilter[optionName].find((option) => {
+                          return option.price === suggestion.name;
+                        })
+                      }
                     />
                     <label htmlFor={suggestion.name}>{suggestion.name}</label>
                   </div>
@@ -147,6 +167,17 @@ const Filters = (props) => {
                         name={brandName.name}
                         value={brandName.name}
                         onChange={() => checkboxUrldata(brandName)}
+                        checked={
+                          props.selectedFilter &&
+                          props.selectedFilter[optionName] &&
+                          props.selectedFilter[optionName].find((option) => {
+                            if (option === brandName.name) {
+                              return "true";
+                            } else if (option.name === brandName.name) {
+                              return "true";
+                            }
+                          })
+                        }
                       />
                       <label htmlFor={brandName.name}>{brandName.name}</label>
                     </div>
@@ -166,11 +197,15 @@ const Filters = (props) => {
                                 onChange={() =>
                                   modelCheckBoxdata(brandName, index)
                                 }
-                                // checked={
-                                //   props.selectedFilters &&
-                                //   props.selectedFilters[ele.name] &&
-                                //   props.selectedFilters[ele.name]
-                                // }
+                                checked={
+                                  props.selectedFilter &&
+                                  props.selectedFilter[optionName] &&
+                                  props.selectedFilter[optionName].find(
+                                    (brand) => {
+                                      return brand.name === brandName.name;
+                                    }
+                                  )
+                                }
                               />
                               <label htmlFor={model.name}>{model.name}</label>
                             </div>
@@ -191,7 +226,7 @@ const Filters = (props) => {
         </div>
         <div>
           <button className={classes.showcarsbtn}>
-            <span>SHOW CARS</span>
+            <span>SHOW {props.count} CARS</span>
           </button>
         </div>
       </div>
