@@ -72,12 +72,24 @@ const DisplayCars = () => {
   const checkBoxUrlHandler = (data) => {
     // console.log(data);
     if (data.values) {
+      let [dataValue] = data.values.map((value) => value.name);
       let newData = {};
       if (selectedFilter[data.name]) {
-        newData = {
-          ...selectedFilter,
-          [data.name]: [...selectedFilter[data.name], ...data.values],
-        };
+        if (
+          selectedFilter[data.name].find((brand) => brand.name === dataValue)
+        ) {
+          newData = {
+            ...selectedFilter,
+            [data.name]: selectedFilter[data.name].filter(
+              (brand) => brand.name !== dataValue
+            ),
+          };
+        } else {
+          newData = {
+            ...selectedFilter,
+            [data.name]: [...selectedFilter[data.name], ...data.values],
+          };
+        }
       } else {
         newData = {
           ...selectedFilter,
@@ -85,14 +97,29 @@ const DisplayCars = () => {
         };
       }
       setSelectedFilter(newData);
+      // console.log(newData);
       urlStringFunc(newData);
     } else {
       let newData = {};
+      // console.log(selectedFilter, data);
       if (selectedFilter[data.name]) {
-        newData = {
-          ...selectedFilter,
-          [data.name]: [...selectedFilter[data.name], data.model],
-        };
+        if (selectedFilter[data.name].includes(data.model)) {
+          let selected = selectedFilter[data.name].filter(
+            (it) => it !== data.model
+          );
+          newData = {
+            ...selectedFilter,
+            [data.name]: selected,
+          };
+          if (selected.length === 0) {
+            delete selectedFilter[data.name];
+          }
+        } else {
+          newData = {
+            ...selectedFilter,
+            [data.name]: [...selectedFilter[data.name], data.model],
+          };
+        }
       } else {
         newData = {
           ...selectedFilter,
@@ -114,37 +141,47 @@ const DisplayCars = () => {
     urlStringFunc(newData);
   };
 
-  // const modelCheckBoxUrlHandler = (data) => {
-  //   // console.log(data);
-  //   let newData = {};
-  //   if (selectedFilter[data.name]) {
-  //     newData = {
-  //       ...selectedFilter,
-  //       [data.name]: [...selectedFilter[data.name], ...data.values],
-  //     };
-  //   } else {
-  //     newData = {
-  //       ...selectedFilter,
-  //       [data.name]: data.values,
-  //     };
-  //   }
-  //   setSelectedFilter(newData);
-  // };
+  const modelCheckBoxUrlHandler = (data) => {
+    let newData = {};
+    if (selectedFilter[data.name]) {
+      newData = {
+        ...selectedFilter,
+        [data.name]: [...selectedFilter[data.name], ...data.values],
+      };
+    } else {
+      newData = {
+        ...selectedFilter,
+        [data.name]: data.values,
+      };
+    }
+    setSelectedFilter(newData);
+    console.log(newData);
+    urlStringFunc(newData);
+  };
 
   // console.log(selectedFilter);
 
   const urlStringFunc = (newData) => {
     let urlString = "";
-    Object.keys(newData).map((key) => {
+    Object.keys(newData).forEach((key) => {
       if (key === "make") {
         let paramString = "sf=";
         paramString += `${key}:`;
         let lastElement = newData[key][newData[key].length - 1];
-        newData[key].map((value) => {
-          paramString += `${value.name}-sub-model:`;
-          paramString += value.models.join(";");
-          if (value !== lastElement) {
-            paramString += `-or-${key}:`;
+        newData[key].forEach((value) => {
+          if (value.models) {
+            paramString += `${value.name}-sub-model:`;
+            paramString += value.models.join(";");
+            if (value !== lastElement) {
+              paramString += `-or-${key}:`;
+            }
+          } else {
+            paramString += `${value.name}-sub-model:`;
+            paramString += value.modelName;
+
+            if (value !== lastElement) {
+              paramString += `-or-${key}:`;
+            }
           }
         });
         if (urlString) {
@@ -152,6 +189,19 @@ const DisplayCars = () => {
         } else {
           urlString += paramString;
         }
+
+        // newData[key].forEach((value) => {
+        //   paramString += `${value.name}-sub-model:`;
+        //   paramString += value.models.join(";");
+        //   if (value !== lastElement) {
+        //     paramString += `-or-${key}:`;
+        //   }
+        // });
+        // if (urlString) {
+        //   urlString += "&" + paramString;
+        // } else {
+        //   urlString += paramString;
+        // }
 
         // console.log(paramString);
       }
@@ -161,7 +211,7 @@ const DisplayCars = () => {
         key === "odometerReading"
       ) {
         // const urlArray = [];
-        newData[key].map((value) => {
+        newData[key].forEach((value) => {
           // console.log(value);
           let filterType = value.filterType;
           let name = value.name;
@@ -185,7 +235,7 @@ const DisplayCars = () => {
         let paramString = "";
         let lastElement = newData[key][newData[key].length - 1];
         paramString += `sf=${key}:`;
-        newData[key].map((value) => {
+        newData[key].forEach((value) => {
           paramString += value;
           if (value !== lastElement) {
             paramString += `-or-${key}:`;
@@ -199,6 +249,7 @@ const DisplayCars = () => {
         }
       }
     });
+    console.log(urlString);
     Axios.get(
       `https://listing-service.qac24svc.dev/v1/vehicle?${urlString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
       { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
@@ -256,7 +307,7 @@ const DisplayCars = () => {
           filter_modal_Close={filter_modal_Close}
           suggestionsUrlHandler={suggestionsUrlHandler}
           checkBoxUrlHandler={checkBoxUrlHandler}
-          // modelCheckBoxUrlHandler={modelCheckBoxUrlHandler}
+          modelCheckBoxUrlHandler={modelCheckBoxUrlHandler}
           selectedFilter={selectedFilter}
           count={count}
         />

@@ -3,6 +3,7 @@ import classes from "./Filters.module.css";
 
 const Filters = (props) => {
   const { filters, filter_modal_Close } = props;
+  // console.log(props.selectedFilter);
 
   const [optionName, setOptionName] = useState("");
   const [filterType, setFilterType] = useState("");
@@ -17,10 +18,10 @@ const Filters = (props) => {
   };
 
   // if (props.selectedFilter[optionName]) {
-  //   // console.log(props.selectedFilter[optionName]);
+  //   console.log(props.selectedFilter[optionName]);
   //   props.selectedFilter[optionName].map((brand) => {
-  //     // console.log(brand.name);
-  //     // console.log(brand.models);
+  //     console.log(brand.name);
+  //     console.log(brand.models);
   //     brand.models.map((model) => {
   //       console.log(model);
   //     });
@@ -46,8 +47,7 @@ const Filters = (props) => {
     });
   };
 
-  const checkboxUrldata = (brandname) => {
-    // console.log(brandname);
+  const checkboxUrldata = (brandname, model) => {
     if (brandname.subFacet) {
       props.checkBoxUrlHandler({
         name: optionName,
@@ -66,18 +66,20 @@ const Filters = (props) => {
     }
   };
 
-  const modelCheckBoxdata = (brandName, index) => {
+  const modelCheckBoxdata = (brandName, model) => {
     // console.log(brandName);
+    // console.log(model);
+    // console.log(optionName);
     // console.log(brandName.subFacet.buckets[index].name);
-    // props.modelCheckBoxUrlHandler({
-    //   name: optionName,
-    //   values: [
-    //     {
-    //       name: brandName.name,
-    //       modelName: brandName.subFacet.buckets[index].name,
-    //     },
-    //   ],
-    // });
+    props.modelCheckBoxUrlHandler({
+      name: optionName,
+      values: [
+        {
+          name: brandName.name,
+          modelName: [model.name],
+        },
+      ],
+    });
   };
 
   return (
@@ -167,23 +169,23 @@ const Filters = (props) => {
                         name={brandName.name}
                         value={brandName.name}
                         onChange={() => checkboxUrldata(brandName)}
-                        checked={
-                          props.selectedFilter &&
-                          props.selectedFilter[optionName] &&
-                          props.selectedFilter[optionName].find((option) => {
-                            if (option === brandName.name) {
-                              return "true";
-                            } else if (option.name === brandName.name) {
-                              return "true";
-                            }
-                          })
-                        }
+                        // checked={
+                        //   props.selectedFilter &&
+                        //   props.selectedFilter[optionName] &&
+                        //   props.selectedFilter[optionName].find((option) => {
+                        //     if (option === brandName.name) {
+                        //       return "true";
+                        //     } else if (option.name === brandName.name) {
+                        //       return "true";
+                        //     }
+                        //   })
+                        // }
                       />
                       <label htmlFor={brandName.name}>{brandName.name}</label>
                     </div>
                     <div>
                       {brandName.subFacet &&
-                        brandName.subFacet.buckets.map((model, index) => {
+                        brandName.subFacet.buckets.map((model) => {
                           return (
                             <div
                               key={model.name}
@@ -195,17 +197,30 @@ const Filters = (props) => {
                                 name={model.name}
                                 value={model.name}
                                 onChange={() =>
-                                  modelCheckBoxdata(brandName, index)
+                                  modelCheckBoxdata(brandName, model)
                                 }
-                                checked={
-                                  props.selectedFilter &&
-                                  props.selectedFilter[optionName] &&
-                                  props.selectedFilter[optionName].find(
-                                    (brand) => {
-                                      return brand.name === brandName.name;
-                                    }
-                                  )
-                                }
+                                // checked={
+                                //   props.selectedFilter &&
+                                //   props.selectedFilter[optionName] &&
+                                //   props.selectedFilter[optionName].find(
+                                //     (brand) => {
+                                //       return brand.name === brandName.name;
+                                //     }
+                                //   )
+                                // }
+                                // checked={
+                                //   props.selectedFilter &&
+                                //   props.selectedFilter[optionName] &&
+                                //   props.selectedFilter[optionName].map(
+                                //     (brand) => {
+                                //       if (brand.name === brandName.name) {
+                                //         brand.models.find(
+                                //           (model) => model === model.name
+                                //         );
+                                //       }
+                                //     }
+                                //   )
+                                // }
                               />
                               <label htmlFor={model.name}>{model.name}</label>
                             </div>
