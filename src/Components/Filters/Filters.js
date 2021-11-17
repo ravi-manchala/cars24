@@ -67,16 +67,12 @@ const Filters = (props) => {
   };
 
   const modelCheckBoxdata = (brandName, model) => {
-    // console.log(brandName);
-    // console.log(model);
-    // console.log(optionName);
-    // console.log(brandName.subFacet.buckets[index].name);
     props.modelCheckBoxUrlHandler({
       name: optionName,
       values: [
         {
           name: brandName.name,
-          modelName: [model.name],
+          models: [model.name],
         },
       ],
     });
@@ -178,6 +174,7 @@ const Filters = (props) => {
                         //     } else if (option.name === brandName.name) {
                         //       return "true";
                         //     }
+                        //     return option;
                         //   })
                         // }
                       />

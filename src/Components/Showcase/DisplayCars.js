@@ -97,11 +97,10 @@ const DisplayCars = () => {
         };
       }
       setSelectedFilter(newData);
-      // console.log(newData);
+      console.log(newData);
       urlStringFunc(newData);
     } else {
       let newData = {};
-      // console.log(selectedFilter, data);
       if (selectedFilter[data.name]) {
         if (selectedFilter[data.name].includes(data.model)) {
           let selected = selectedFilter[data.name].filter(
@@ -142,12 +141,90 @@ const DisplayCars = () => {
   };
 
   const modelCheckBoxUrlHandler = (data) => {
+    // console.log(data);
+    // let newData = {};
+    // if (selectedFilter[data.name]) {
+    // console.log(selectedFilter[data.name], data.values);
+    // const filtered = selectedFilter[data.name].find(
+    //   (it) => it.name === data.values[0].name
+    // );
+    // const included = selectedFilter[data.name].find((it) =>
+    //   it.models.includes(data.values[0].models[0])
+    // );
+    // if (filtered) {
+    //   const included = selectedFilter[data.name].find((it) =>
+    //     it.models.includes(data.values[0].models[0])
+    //   );
+    //   if (included) {
+    //     console.log("Yes it is included");
+    //   }
+    // }
+    // if (filtered && included) {
+    //   newData = {
+    //     ...selectedFilter,
+    //     [data.name]: selectedFilter[data.name].map((it) => {
+    //       return {
+    //         ...it,
+    //         models: selectedFilter[data.name].map((it) =>
+    //           it.models.filter((model) => model !== data.values[0].models[0])
+    //         ),
+    //       };
+    //     }),
+    //   };
+    // } else if (filtered) {
+    //   newData = {
+    //     ...selectedFilter,
+    //     [data.name]: selectedFilter[data.name].map((it) => {
+    //       if (it.name === data.values[0].name) {
+    //         return {
+    //           ...it,
+    //           models: [...it.models, ...data.values[0].models],
+    //         };
+    //       }
+    //       return it;
+    //     }),
+    //   };
+    // } else {
+    //   newData = {
+    //     ...selectedFilter,
+    //     [data.name]: [...selectedFilter[data.name], ...data.values],
+    //   };
+    // }
+    // } else {
+    //   newData = {
+    //     ...selectedFilter,
+    //     [data.name]: data.values,
+    //   };
+    // }
+    // setSelectedFilter(newData);
+    // console.log(newData);
+    // urlStringFunc(newData);
+
     let newData = {};
     if (selectedFilter[data.name]) {
-      newData = {
-        ...selectedFilter,
-        [data.name]: [...selectedFilter[data.name], ...data.values],
-      };
+      // console.log(selectedFilter[data.name], data.values);
+      const filtered = selectedFilter[data.name].find(
+        (it) => it.name === data.values[0].name
+      );
+      if (filtered) {
+        newData = {
+          ...selectedFilter,
+          [data.name]: selectedFilter[data.name].map((it) => {
+            if (it.name === data.values[0].name) {
+              return {
+                ...it,
+                models: [...it.models, ...data.values[0].models],
+              };
+            }
+            return it;
+          }),
+        };
+      } else {
+        newData = {
+          ...selectedFilter,
+          [data.name]: [...selectedFilter[data.name], ...data.values],
+        };
+      }
     } else {
       newData = {
         ...selectedFilter,
@@ -169,19 +246,10 @@ const DisplayCars = () => {
         paramString += `${key}:`;
         let lastElement = newData[key][newData[key].length - 1];
         newData[key].forEach((value) => {
-          if (value.models) {
-            paramString += `${value.name}-sub-model:`;
-            paramString += value.models.join(";");
-            if (value !== lastElement) {
-              paramString += `-or-${key}:`;
-            }
-          } else {
-            paramString += `${value.name}-sub-model:`;
-            paramString += value.modelName;
-
-            if (value !== lastElement) {
-              paramString += `-or-${key}:`;
-            }
+          paramString += `${value.name}-sub-model:`;
+          paramString += value.models.join(";");
+          if (value !== lastElement) {
+            paramString += `-or-${key}:`;
           }
         });
         if (urlString) {
@@ -189,19 +257,6 @@ const DisplayCars = () => {
         } else {
           urlString += paramString;
         }
-
-        // newData[key].forEach((value) => {
-        //   paramString += `${value.name}-sub-model:`;
-        //   paramString += value.models.join(";");
-        //   if (value !== lastElement) {
-        //     paramString += `-or-${key}:`;
-        //   }
-        // });
-        // if (urlString) {
-        //   urlString += "&" + paramString;
-        // } else {
-        //   urlString += paramString;
-        // }
 
         // console.log(paramString);
       }
