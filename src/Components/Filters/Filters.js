@@ -138,6 +138,9 @@ const Filters = (props) => {
                             name={model.name}
                             id={model.name}
                             value={model.name}
+                            onChange={() =>
+                              modelCheckBoxdata(suggestion, model)
+                            }
                           />
                           <label htmlFor={model.name}>
                             {suggestion.name} {model.name}
@@ -165,18 +168,17 @@ const Filters = (props) => {
                         name={brandName.name}
                         value={brandName.name}
                         onChange={() => checkboxUrldata(brandName)}
-                        // checked={
-                        //   props.selectedFilter &&
-                        //   props.selectedFilter[optionName] &&
-                        //   props.selectedFilter[optionName].find((option) => {
-                        //     if (option === brandName.name) {
-                        //       return "true";
-                        //     } else if (option.name === brandName.name) {
-                        //       return "true";
-                        //     }
-                        //     return option;
-                        //   })
-                        // }
+                        checked={
+                          props.selectedFilter &&
+                          props.selectedFilter[optionName] &&
+                          props.selectedFilter[optionName].find((it) => {
+                            if (it === brandName.name) {
+                              return "true";
+                            } else if (it.name === brandName.name) {
+                              return "true";
+                            }
+                          })
+                        }
                       />
                       <label htmlFor={brandName.name}>{brandName.name}</label>
                     </div>
@@ -205,19 +207,19 @@ const Filters = (props) => {
                                 //     }
                                 //   )
                                 // }
-                                // checked={
-                                //   props.selectedFilter &&
-                                //   props.selectedFilter[optionName] &&
-                                //   props.selectedFilter[optionName].map(
-                                //     (brand) => {
-                                //       if (brand.name === brandName.name) {
-                                //         brand.models.find(
-                                //           (model) => model === model.name
-                                //         );
-                                //       }
-                                //     }
-                                //   )
-                                // }
+                                checked={
+                                  props.selectedFilter &&
+                                  props.selectedFilter[optionName] &&
+                                  props.selectedFilter[optionName].map(
+                                    (brand) => {
+                                      if (brand.name === brandName.name) {
+                                        brand.models.find(
+                                          (model) => model === model.name
+                                        );
+                                      }
+                                    }
+                                  )
+                                }
                               />
                               <label htmlFor={model.name}>{model.name}</label>
                             </div>

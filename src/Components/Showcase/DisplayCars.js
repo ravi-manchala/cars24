@@ -72,17 +72,41 @@ const DisplayCars = () => {
   const checkBoxUrlHandler = (data) => {
     // console.log(data);
     if (data.values) {
-      let [dataValue] = data.values.map((value) => value.name);
       let newData = {};
       if (selectedFilter[data.name]) {
-        if (
-          selectedFilter[data.name].find((brand) => brand.name === dataValue)
-        ) {
+        let length;
+        filters.map((filter) => {
+          if (filter.name === data.name) {
+            filter.buckets.map((bucket) => {
+              if (bucket.name === data.values[0].name) {
+                length = bucket.subFacet.buckets.length;
+              }
+              return bucket;
+            });
+          }
+          return filter;
+        });
+        let modelLength = selectedFilter[data.name].find(
+          (it) => it.models.length === length
+        );
+        let filtered = selectedFilter[data.name].find(
+          (brand) => brand.name === data.values[0].name
+        );
+
+        if (filtered && modelLength) {
           newData = {
             ...selectedFilter,
             [data.name]: selectedFilter[data.name].filter(
-              (brand) => brand.name !== dataValue
+              (brand) => brand.name !== data.values[0].name
             ),
+          };
+          if (newData[data.name].length === 0) {
+            delete newData[data.name];
+          }
+        } else if (filtered) {
+          newData = {
+            ...selectedFilter,
+            [data.name]: [...data.values],
           };
         } else {
           newData = {
@@ -97,7 +121,7 @@ const DisplayCars = () => {
         };
       }
       setSelectedFilter(newData);
-      console.log(newData);
+      // console.log(newData);
       urlStringFunc(newData);
     } else {
       let newData = {};
@@ -111,7 +135,7 @@ const DisplayCars = () => {
             [data.name]: selected,
           };
           if (selected.length === 0) {
-            delete selectedFilter[data.name];
+            delete newData[data.name];
           }
         } else {
           newData = {
@@ -129,7 +153,6 @@ const DisplayCars = () => {
       urlStringFunc(newData);
     }
   };
-  // console.log(selectedFilter);
 
   const suggestionsUrlHandler = (data) => {
     let newData = {
@@ -142,83 +165,56 @@ const DisplayCars = () => {
 
   const modelCheckBoxUrlHandler = (data) => {
     // console.log(data);
-    // let newData = {};
-    // if (selectedFilter[data.name]) {
-    // console.log(selectedFilter[data.name], data.values);
-    // const filtered = selectedFilter[data.name].find(
-    //   (it) => it.name === data.values[0].name
-    // );
-    // const included = selectedFilter[data.name].find((it) =>
-    //   it.models.includes(data.values[0].models[0])
-    // );
-    // if (filtered) {
-    //   const included = selectedFilter[data.name].find((it) =>
-    //     it.models.includes(data.values[0].models[0])
-    //   );
-    //   if (included) {
-    //     console.log("Yes it is included");
-    //   }
-    // }
-    // if (filtered && included) {
-    //   newData = {
-    //     ...selectedFilter,
-    //     [data.name]: selectedFilter[data.name].map((it) => {
-    //       return {
-    //         ...it,
-    //         models: selectedFilter[data.name].map((it) =>
-    //           it.models.filter((model) => model !== data.values[0].models[0])
-    //         ),
-    //       };
-    //     }),
-    //   };
-    // } else if (filtered) {
-    //   newData = {
-    //     ...selectedFilter,
-    //     [data.name]: selectedFilter[data.name].map((it) => {
-    //       if (it.name === data.values[0].name) {
-    //         return {
-    //           ...it,
-    //           models: [...it.models, ...data.values[0].models],
-    //         };
-    //       }
-    //       return it;
-    //     }),
-    //   };
-    // } else {
-    //   newData = {
-    //     ...selectedFilter,
-    //     [data.name]: [...selectedFilter[data.name], ...data.values],
-    //   };
-    // }
-    // } else {
-    //   newData = {
-    //     ...selectedFilter,
-    //     [data.name]: data.values,
-    //   };
-    // }
-    // setSelectedFilter(newData);
-    // console.log(newData);
-    // urlStringFunc(newData);
-
     let newData = {};
     if (selectedFilter[data.name]) {
-      // console.log(selectedFilter[data.name], data.values);
+      // console.log(selectedFilter[data.name]);
       const filtered = selectedFilter[data.name].find(
         (it) => it.name === data.values[0].name
       );
       if (filtered) {
-        newData = {
-          ...selectedFilter,
-          [data.name]: selectedFilter[data.name].map((it) => {
-            if (it.name === data.values[0].name) {
+        let included = selectedFilter[data.name].find((it) =>
+          it.models.includes(data.values[0].models[0])
+        );
+
+        if (included) {
+          newData = {
+            ...selectedFilter,
+            [data.name]: selectedFilter[data.name].map((it) => {
               return {
                 ...it,
-                models: [...it.models, ...data.values[0].models],
+                models: it.models.filter(
+                  (model) => model !== data.values[0].models[0]
+                ),
               };
+            }),
+          };
+          if (
+            newData[data.name].filter((it, index) => {
+              if (it.models.length === 0) {
+                return newData[data.name].splice(index, 1);
+              } else {
+                return it;
+              }
+            })
+          )
+            if (newData[data.name].length === 0) {
+              delete newData[data.name];
             }
-            return it;
-          }),
-        };
+        } else {
+          newData = {
+            ...selectedFilter,
+            [data.name]: selectedFilter[data.name].map((it) => {
+              if (it.name === data.values[0].name) {
+                return {
+                  ...it,
+                  models: [...it.models, ...data.values[0].models],
+                };
+              } else {
+                return it;
+              }
+            }),
+          };
+        }
       } else {
         newData = {
           ...selectedFilter,
