@@ -48,6 +48,7 @@ const Filters = (props) => {
   };
 
   const checkboxUrldata = (brandname, model) => {
+    console.log(brandname);
     if (brandname.subFacet) {
       props.checkBoxUrlHandler({
         name: optionName,
@@ -141,6 +142,13 @@ const Filters = (props) => {
                             onChange={() =>
                               modelCheckBoxdata(suggestion, model)
                             }
+                            checked={
+                              props.selectedFilter &&
+                              props.selectedFilter[optionName] &&
+                              props.selectedFilter[optionName].find((brand) => {
+                                return brand.models.includes(model.name);
+                              })
+                            }
                           />
                           <label htmlFor={model.name}>
                             {suggestion.name} {model.name}
@@ -172,10 +180,18 @@ const Filters = (props) => {
                           props.selectedFilter &&
                           props.selectedFilter[optionName] &&
                           props.selectedFilter[optionName].find((it) => {
-                            if (it === brandName.name) {
-                              return "true";
-                            } else if (it.name === brandName.name) {
-                              return "true";
+                            if (it.models) {
+                              if (
+                                it.models.length ===
+                                brandName.subFacet.buckets.length
+                              ) {
+                                return true;
+                              }
+                            }
+                            if (it) {
+                              if (it === brandName.name) {
+                                return "true";
+                              }
                             }
                           })
                         }
@@ -198,25 +214,12 @@ const Filters = (props) => {
                                 onChange={() =>
                                   modelCheckBoxdata(brandName, model)
                                 }
-                                // checked={
-                                //   props.selectedFilter &&
-                                //   props.selectedFilter[optionName] &&
-                                //   props.selectedFilter[optionName].find(
-                                //     (brand) => {
-                                //       return brand.name === brandName.name;
-                                //     }
-                                //   )
-                                // }
                                 checked={
                                   props.selectedFilter &&
                                   props.selectedFilter[optionName] &&
-                                  props.selectedFilter[optionName].map(
+                                  props.selectedFilter[optionName].find(
                                     (brand) => {
-                                      if (brand.name === brandName.name) {
-                                        brand.models.find(
-                                          (model) => model === model.name
-                                        );
-                                      }
+                                      return brand.models.includes(model.name);
                                     }
                                   )
                                 }

@@ -121,7 +121,7 @@ const DisplayCars = () => {
         };
       }
       setSelectedFilter(newData);
-      // console.log(newData);
+      console.log(newData);
       urlStringFunc(newData);
     } else {
       let newData = {};
