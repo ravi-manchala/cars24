@@ -38,13 +38,21 @@ const DisplayCars = () => {
   // Total number of cars count
   const [count, setCount] = useState();
 
+  //Selelcted filters URL state
+  const [filterUrl, setFilterUrl] = useState("");
+
   //Used cars data API call
   const usedCarsData = (page) => {
     Axios.get(
-      `https://listing-service.qac24svc.dev/v1/vehicle?sf=city:DU_DUBAI&size=25&spath=buy-used-cars-dubai&variant=filterV3&page=${page}`,
+      `https://listing-service.qac24svc.dev/v1/vehicle?${filterUrl}&sf=city:DU_DUBAI&size=25&spath=buy-used-cars-dubai&variant=filterV3&page=${page}`,
       { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
     ).then((resp) => {
-      setData([...data, ...resp.data.results]);
+      if (page === 0) {
+        setData([...resp.data.results]);
+      } else {
+        setData([...data, ...resp.data.results]);
+      }
+      setFiltersCompOpen(false);
       if (resp.data.results.length < 25) {
         setHasmore(false);
       } else if (!hasMore) {
@@ -64,6 +72,7 @@ const DisplayCars = () => {
         return response.data.filters[ele];
       });
       setFilters(result);
+      setCount(response.data.total);
     });
   };
 
@@ -121,7 +130,7 @@ const DisplayCars = () => {
         };
       }
       setSelectedFilter(newData);
-      console.log(newData);
+      // console.log(newData);
       urlStringFunc(newData);
     } else {
       let newData = {};
@@ -228,11 +237,9 @@ const DisplayCars = () => {
       };
     }
     setSelectedFilter(newData);
-    console.log(newData);
+    // console.log(newData);
     urlStringFunc(newData);
   };
-
-  // console.log(selectedFilter);
 
   const urlStringFunc = (newData) => {
     let urlString = "";
@@ -253,15 +260,12 @@ const DisplayCars = () => {
         } else {
           urlString += paramString;
         }
-
-        // console.log(paramString);
       }
       if (
         key === "quotedPrice" ||
         key === "year" ||
         key === "odometerReading"
       ) {
-        // const urlArray = [];
         newData[key].forEach((value) => {
           // console.log(value);
           let filterType = value.filterType;
@@ -292,7 +296,6 @@ const DisplayCars = () => {
             paramString += `-or-${key}:`;
           }
         });
-        // console.log(paramString);
         if (urlString) {
           urlString += "&" + paramString;
         } else {
@@ -300,7 +303,8 @@ const DisplayCars = () => {
         }
       }
     });
-    console.log(urlString);
+    // console.log(urlString);
+    setFilterUrl(urlString);
     Axios.get(
       `https://listing-service.qac24svc.dev/v1/vehicle?${urlString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
       { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
@@ -308,6 +312,8 @@ const DisplayCars = () => {
       setCount(response.data.total);
     });
   };
+  // console.log(selectedFilter);
+  // console.log(filterUrl);
 
   useEffect(() => {
     filterData();
@@ -361,6 +367,8 @@ const DisplayCars = () => {
           modelCheckBoxUrlHandler={modelCheckBoxUrlHandler}
           selectedFilter={selectedFilter}
           count={count}
+          usedCarsData={() => usedCarsData(0)}
+          urlStringFunc={urlStringFunc}
         />
       </Modal>
 

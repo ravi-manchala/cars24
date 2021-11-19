@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import classes from "./Filters.module.css";
+import Modal from "react-modal";
 
 const Filters = (props) => {
   const { filters, filter_modal_Close } = props;
   // console.log(props.selectedFilter);
+  // console.log(Object.keys(props.selectedFilter));
+  // console.log(filters);
 
   const [optionName, setOptionName] = useState("");
   const [filterType, setFilterType] = useState("");
   const [suggestionData, setSuggestionsData] = useState();
   const [bucketData, setBucketData] = useState();
+  const [clear_Filters_Modal, setClear_Filters_Modal] = useState(false);
+  const [clearSelectedFilter, setClearSelectedFilter] = useState([]);
 
   const optionsData = (index) => {
     setOptionName(filters[index].name);
@@ -17,23 +22,27 @@ const Filters = (props) => {
     setBucketData(filters[index].buckets);
   };
 
-  // if (props.selectedFilter[optionName]) {
-  //   console.log(props.selectedFilter[optionName]);
-  //   props.selectedFilter[optionName].map((brand) => {
-  //     console.log(brand.name);
-  //     console.log(brand.models);
-  //     brand.models.map((model) => {
-  //       console.log(model);
-  //     });
-  //   });
-  // }
-
   // console.log(filters);
   // console.log(filterType);
   // console.log(optionName);
   // console.log(filterType);
   // console.log(suggestionData);
   // console.log(bucketData);
+
+  // console.log(clearSelectedFilter);
+
+  let selectedFiltersArraya = [];
+  Object.keys(props.selectedFilter).map((selected) => {
+    filters.find((filter) => {
+      if (filter.name === selected) {
+        selectedFiltersArraya.push({
+          name: selected,
+          displayName: filter.displayName,
+        });
+      }
+    });
+  });
+  // console.log(selectedFiltersArraya);
 
   const suggestionUrlData = (index, filterType) => {
     props.suggestionsUrlHandler({
@@ -48,7 +57,6 @@ const Filters = (props) => {
   };
 
   const checkboxUrldata = (brandname, model) => {
-    console.log(brandname);
     if (brandname.subFacet) {
       props.checkBoxUrlHandler({
         name: optionName,
@@ -78,6 +86,31 @@ const Filters = (props) => {
       ],
     });
   };
+
+  const clearModalOpen = () => {
+    setClear_Filters_Modal(true);
+    setClearSelectedFilter(selectedFiltersArraya);
+  };
+
+  const clearModalClose = () => {
+    setClear_Filters_Modal(false);
+  };
+
+  const unSelectFilters = (selected) => {
+    let clearRemainFilters = clearSelectedFilter.filter(
+      (it) => it.displayName !== selected.displayName
+    );
+    setClearSelectedFilter(clearRemainFilters);
+  };
+
+  const removeSelectedFilters = () => {
+    setClear_Filters_Modal(false);
+    clearSelectedFilter.map((filter) => {
+      delete props.selectedFilter[filter.name];
+    });
+    props.urlStringFunc(props.selectedFilter);
+  };
+  // console.log(props.selectedFilter);
 
   return (
     <div className={classes.filter_modal_ui}>
@@ -237,16 +270,63 @@ const Filters = (props) => {
       </div>
       <div className={classes.btns}>
         <div>
-          <button className={classes.clearbtn}>
+          <button className={classes.clearbtn} onClick={clearModalOpen}>
             <span>CLEAR ALL</span>
           </button>
         </div>
         <div>
-          <button className={classes.showcarsbtn}>
-            <span>SHOW {props.count} CARS</span>
+          <button
+            className={classes.showcarsbtn}
+            onClick={props.usedCarsData}
+            disabled={props.count === 0}
+          >
+            {props.count === 0 ? (
+              <span>NO CARS AVAILABLE</span>
+            ) : (
+              <span>SHOW {props.count} CARS</span>
+            )}
           </button>
         </div>
       </div>
+      <Modal
+        className={classes.modal}
+        isOpen={clear_Filters_Modal}
+        ariaHideApp={false}
+      >
+        <div>
+          <div>
+            <h4>Clear Filters</h4>
+          </div>
+          <div>
+            <p>Would you like to clear following filters?</p>
+          </div>
+          <div>
+            {selectedFiltersArraya &&
+              selectedFiltersArraya.map((selected, index) => {
+                return (
+                  <div>
+                    <input
+                      type="checkbox"
+                      onChange={() => unSelectFilters(selected, index)}
+                      checked={clearSelectedFilter.find(
+                        (it) => it.displayName === selected.displayName
+                      )}
+                    />
+                    <label>{selected.displayName}</label>
+                  </div>
+                );
+              })}
+          </div>
+          <div>
+            <button onClick={clearModalClose}>
+              <span>Cancel</span>
+            </button>
+            <button onClick={removeSelectedFilters}>
+              <span>Clear Filters</span>
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
