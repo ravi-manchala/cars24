@@ -32,7 +32,7 @@ const Filters = (props) => {
   // console.log(clearSelectedFilter);
 
   let selectedFiltersArraya = [];
-  Object.keys(props.selectedFilter).map((selected) => {
+  Object.keys(props.selectedFilter).forEach((selected) => {
     filters.find((filter) => {
       if (filter.name === selected) {
         selectedFiltersArraya.push({
@@ -105,9 +105,9 @@ const Filters = (props) => {
 
   const removeSelectedFilters = () => {
     setClear_Filters_Modal(false);
-    clearSelectedFilter.map((filter) => {
-      delete props.selectedFilter[filter.name];
-    });
+    clearSelectedFilter.map(
+      (filter) => delete props.selectedFilter[filter.name]
+    );
     props.urlStringFunc(props.selectedFilter);
   };
   // console.log(props.selectedFilter);
@@ -134,11 +134,19 @@ const Filters = (props) => {
         </div>
         <div className={classes.suggestions_bucketData}>
           <div>
+            {suggestionData && (
+              <h5 className={classes.suggestions_heading}>Suggestions</h5>
+            )}
+          </div>
+          <div>
             {suggestionData &&
               filterType === "rf" &&
               suggestionData.map((suggestion, index) => {
                 return (
-                  <div key={suggestion.name}>
+                  <div
+                    key={suggestion.name}
+                    className={classes.radioBtn_design}
+                  >
                     <input
                       type="radio"
                       name="suggestion"
@@ -153,7 +161,12 @@ const Filters = (props) => {
                         })
                       }
                     />
-                    <label htmlFor={suggestion.name}>{suggestion.name}</label>
+                    <label
+                      htmlFor={suggestion.name}
+                      className={classes.radioBtn_label}
+                    >
+                      {suggestion.name}
+                    </label>
                   </div>
                 );
               })}
@@ -166,7 +179,10 @@ const Filters = (props) => {
                   <div key={suggestion.name}>
                     {suggestion.subFacet.buckets.map((model) => {
                       return (
-                        <div key={model.name}>
+                        <div
+                          key={model.name}
+                          className={classes.checkBox_design}
+                        >
                           <input
                             type="checkbox"
                             name={model.name}
@@ -195,6 +211,11 @@ const Filters = (props) => {
           </div>
 
           <div>
+            <div>
+              {suggestionData && filterType === "sf" && (
+                <h5 className={classes.all_brands_heading}>All Brands</h5>
+              )}
+            </div>
             {bucketData &&
               bucketData.map((brandName) => {
                 return (
@@ -202,7 +223,11 @@ const Filters = (props) => {
                     className={classes.brand_modal_name}
                     key={brandName.name}
                   >
-                    <div className={classes.car_brand_name}>
+                    <div
+                      className={
+                        (classes.car_brand_name, classes.checkBox_design)
+                      }
+                    >
                       <input
                         type="checkbox"
                         id={brandName.name}
@@ -229,7 +254,12 @@ const Filters = (props) => {
                           })
                         }
                       />
-                      <label htmlFor={brandName.name}>{brandName.name}</label>
+                      <label
+                        htmlFor={brandName.name}
+                        className={classes.car_brand_label_design}
+                      >
+                        {brandName.name}
+                      </label>
                     </div>
                     <div>
                       {brandName.subFacet &&
@@ -237,7 +267,10 @@ const Filters = (props) => {
                           return (
                             <div
                               key={model.name}
-                              className={classes.car_modal_name}
+                              className={
+                                (classes.car_modal_name,
+                                classes.checkBox_design)
+                              }
                             >
                               <input
                                 type="checkbox"
@@ -257,7 +290,12 @@ const Filters = (props) => {
                                   )
                                 }
                               />
-                              <label htmlFor={model.name}>{model.name}</label>
+                              <label
+                                htmlFor={model.name}
+                                className={classes.car_modal_label_design}
+                              >
+                                {model.name}
+                              </label>
                             </div>
                           );
                         })}
@@ -293,18 +331,18 @@ const Filters = (props) => {
         isOpen={clear_Filters_Modal}
         ariaHideApp={false}
       >
-        <div>
-          <div>
+        <div className={classes.clear_modal_component}>
+          <div className={classes.clear_modal_component_heading}>
             <h4>Clear Filters</h4>
           </div>
-          <div>
+          <div className={classes.clear_modal_component_paragraph}>
             <p>Would you like to clear following filters?</p>
           </div>
           <div>
             {selectedFiltersArraya &&
               selectedFiltersArraya.map((selected, index) => {
                 return (
-                  <div>
+                  <div className={classes.checkBox_design}>
                     <input
                       type="checkbox"
                       onChange={() => unSelectFilters(selected, index)}
@@ -317,13 +355,20 @@ const Filters = (props) => {
                 );
               })}
           </div>
-          <div>
-            <button onClick={clearModalClose}>
-              <span>Cancel</span>
-            </button>
-            <button onClick={removeSelectedFilters}>
-              <span>Clear Filters</span>
-            </button>
+          <div className={classes.btns}>
+            <div>
+              <button onClick={clearModalClose} className={classes.clearbtn}>
+                <span>Cancel</span>
+              </button>
+            </div>
+            <div>
+              <button
+                onClick={removeSelectedFilters}
+                className={classes.showcarsbtn}
+              >
+                <span>Clear Filters</span>
+              </button>
+            </div>
           </div>
         </div>
       </Modal>
