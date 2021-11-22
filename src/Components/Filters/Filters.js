@@ -33,7 +33,7 @@ const Filters = (props) => {
 
   let selectedFiltersArraya = [];
   Object.keys(props.selectedFilter).forEach((selected) => {
-    filters.find((filter) => {
+    filters.forEach((filter) => {
       if (filter.name === selected) {
         selectedFiltersArraya.push({
           name: selected,
@@ -85,6 +85,90 @@ const Filters = (props) => {
         },
       ],
     });
+  };
+
+  const radio_check_status = (suggestion) => {
+    const { selectedFilter } = props;
+    let isChecked = false;
+    if (selectedFilter) {
+      if (selectedFilter[optionName]) {
+        if (selectedFilter[optionName][0].price === suggestion) {
+          isChecked = true;
+        }
+      }
+    }
+    return isChecked;
+  };
+
+  const suggestion_checkBox_status = (model) => {
+    const { selectedFilter } = props;
+    let isChecked = false;
+    if (selectedFilter) {
+      if (selectedFilter[optionName]) {
+        const length = selectedFilter[optionName].length;
+        for (let index = 0; index < length; index++) {
+          const element = selectedFilter[optionName][index];
+          if (element.models && element.models.includes(model)) {
+            isChecked = true;
+            break;
+          }
+        }
+      }
+    }
+    return isChecked;
+  };
+
+  const brand_check_status = (brandName) => {
+    const { selectedFilter } = props;
+    let isChecked = false;
+    if (selectedFilter) {
+      if (selectedFilter[optionName]) {
+        const item = selectedFilter[optionName].find(
+          (it) => it.name === brandName.name || it === brandName.name
+        );
+        if (item) {
+          if (item.models) {
+            isChecked =
+              item.models.length === brandName.subFacet.buckets.length;
+          } else {
+            isChecked = item === brandName.name;
+          }
+        }
+      }
+    }
+    return isChecked;
+  };
+
+  const model_check_status = (model) => {
+    const { selectedFilter } = props;
+    let isChecked = false;
+    if (selectedFilter) {
+      if (selectedFilter[optionName]) {
+        const length = selectedFilter[optionName].length;
+        for (let index = 0; index < length; index++) {
+          const element = selectedFilter[optionName][index];
+          if (element.models && element.models.includes(model)) {
+            isChecked = true;
+            break;
+          }
+        }
+      }
+    }
+    return isChecked;
+  };
+
+  const clear_check_status = (selected) => {
+    let isChecked = false;
+    if (clearSelectedFilter) {
+      const length = clearSelectedFilter.length;
+      for (let i = 0; i < length; i++) {
+        const ele = clearSelectedFilter[i];
+        if (ele.displayName === selected.displayName) {
+          isChecked = true;
+        }
+      }
+    }
+    return isChecked;
   };
 
   const clearModalOpen = () => {
@@ -153,13 +237,7 @@ const Filters = (props) => {
                       id={suggestion.name}
                       value={suggestion.name}
                       onChange={() => suggestionUrlData(index, filterType)}
-                      checked={
-                        props.selectedFilter &&
-                        props.selectedFilter[optionName] &&
-                        props.selectedFilter[optionName].find((option) => {
-                          return option.price === suggestion.name;
-                        })
-                      }
+                      checked={radio_check_status(suggestion.name)}
                     />
                     <label
                       htmlFor={suggestion.name}
@@ -191,15 +269,12 @@ const Filters = (props) => {
                             onChange={() =>
                               modelCheckBoxdata(suggestion, model)
                             }
-                            checked={
-                              props.selectedFilter &&
-                              props.selectedFilter[optionName] &&
-                              props.selectedFilter[optionName].find((brand) => {
-                                return brand.models.includes(model.name);
-                              })
-                            }
+                            checked={suggestion_checkBox_status(model.name)}
                           />
-                          <label htmlFor={model.name}>
+                          <label
+                            htmlFor={model.name}
+                            className={classes.suggestion_checkBox_label}
+                          >
                             {suggestion.name} {model.name}
                           </label>
                         </div>
@@ -234,25 +309,7 @@ const Filters = (props) => {
                         name={brandName.name}
                         value={brandName.name}
                         onChange={() => checkboxUrldata(brandName)}
-                        checked={
-                          props.selectedFilter &&
-                          props.selectedFilter[optionName] &&
-                          props.selectedFilter[optionName].find((it) => {
-                            if (it.models) {
-                              if (
-                                it.models.length ===
-                                brandName.subFacet.buckets.length
-                              ) {
-                                return true;
-                              }
-                            }
-                            if (it) {
-                              if (it === brandName.name) {
-                                return "true";
-                              }
-                            }
-                          })
-                        }
+                        checked={brand_check_status(brandName)}
                       />
                       <label
                         htmlFor={brandName.name}
@@ -280,15 +337,7 @@ const Filters = (props) => {
                                 onChange={() =>
                                   modelCheckBoxdata(brandName, model)
                                 }
-                                checked={
-                                  props.selectedFilter &&
-                                  props.selectedFilter[optionName] &&
-                                  props.selectedFilter[optionName].find(
-                                    (brand) => {
-                                      return brand.models.includes(model.name);
-                                    }
-                                  )
-                                }
+                                checked={model_check_status(model.name)}
                               />
                               <label
                                 htmlFor={model.name}
@@ -308,7 +357,11 @@ const Filters = (props) => {
       </div>
       <div className={classes.btns}>
         <div>
-          <button className={classes.clearbtn} onClick={clearModalOpen}>
+          <button
+            className={classes.clearbtn}
+            onClick={clearModalOpen}
+            disabled={selectedFiltersArraya.length === 0}
+          >
             <span>CLEAR ALL</span>
           </button>
         </div>
@@ -336,21 +389,28 @@ const Filters = (props) => {
             <h4>Clear Filters</h4>
           </div>
           <div className={classes.clear_modal_component_paragraph}>
-            <p>Would you like to clear following filters?</p>
+            <p>Would you like to clear following filters ?</p>
           </div>
-          <div>
+          <div className={classes.clear_selected_filters}>
             {selectedFiltersArraya &&
               selectedFiltersArraya.map((selected, index) => {
                 return (
                   <div className={classes.checkBox_design}>
                     <input
                       type="checkbox"
+                      id={selected.displayName}
                       onChange={() => unSelectFilters(selected, index)}
-                      checked={clearSelectedFilter.find(
-                        (it) => it.displayName === selected.displayName
-                      )}
+                      // checked={clearSelectedFilter.find(
+                      //   (it) => it.displayName === selected.displayName
+                      // )}
+                      checked={clear_check_status(selected)}
                     />
-                    <label>{selected.displayName}</label>
+                    <label
+                      htmlFor={selected.displayName}
+                      className={classes.clear_checkbox_label}
+                    >
+                      {selected.displayName}
+                    </label>
                   </div>
                 );
               })}

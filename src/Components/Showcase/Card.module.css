@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
 .card {
   width: 100%;
   margin-bottom: 20px;
@@ -23,10 +25,15 @@
 .likebtn {
   margin: 12px 0;
   font-size: 18px;
-  font-weight: 900;
+  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.likebtn h4 {
+  font-family: "Roboto", sans-serif;
+  color: #465166;
 }
 
 .specification > p {
@@ -38,10 +45,13 @@
   font-weight: 650;
   border-right: 3px solid #d0cdcd;
   padding-right: 3px;
+  font-family: "Roboto", sans-serif;
+  color: #465166;
 }
 
 .specification > p > span {
   padding-left: 5px;
+  color: #465166;
 }
 
 .speedmeter {
@@ -49,6 +59,11 @@
   align-items: center;
   font-weight: 300;
   margin: 15px 0;
+}
+
+.speedmeter span {
+  margin-left: 5px;
+  color: #465166;
 }
 
 .turbo {
@@ -59,18 +74,27 @@
   display: flex;
   justify-content: space-between;
   margin: 15px 0;
-}
-
-.emi h4 {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.emi p {
-  font-size: small;
-  margin-bottom: 15px;
+  align-items: center;
 }
 
 .emimonthly h4 {
+  font-size: 17px;
+  font-family: "Roboto", sans-serif;
   color: #ef7e2b;
+
+  padding-bottom: 6px;
+}
+
+.emi p {
+  font-size: 12px;
+  font-family: "Roboto", sans-serif;
+  margin-bottom: 15px;
+  color: #b2b2b2;
+}
+
+.price h4 {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  padding-bottom: 6px;
+  color: #465166;
 }

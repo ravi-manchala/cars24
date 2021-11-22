@@ -49,7 +49,7 @@ const Card = (props) => {
             <h4>AED {props.card.emiDetails.emi}/month</h4>
             <p>AED {props.card.downPayment} downpayment</p>
           </div>
-          <div>
+          <div className={classes.price}>
             <h4>AED {props.card.price}</h4>
             <p>
               <del>AED {props.card.discountAmount}</del>
