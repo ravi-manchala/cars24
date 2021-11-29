@@ -33,18 +33,26 @@ const DisplayCars = () => {
   const [filtersCompOpen, setFiltersCompOpen] = useState(false);
   const [hasMore, setHasmore] = useState(false);
 
+  // selected filters state
   const [selectedFilter, setSelectedFilter] = useState({});
 
   // Total number of cars count
   const [count, setCount] = useState();
 
-  //Selelcted filters URL state
-  const [filterUrl, setFilterUrl] = useState("");
+  // console.log(selectedFilter);
 
   //Used cars data API call
-  const usedCarsData = (page) => {
+  const usedCarsData = (page, newFiltes = null) => {
+    let url = "";
+    if (newFiltes) {
+      setSelectedFilter(newFiltes);
+      url = urlStringFunc(newFiltes);
+    } else {
+      url = urlStringFunc(selectedFilter);
+    }
+
     Axios.get(
-      `https://listing-service.qac24svc.dev/v1/vehicle?${filterUrl}&sf=city:DU_DUBAI&size=25&spath=buy-used-cars-dubai&variant=filterV3&page=${page}`,
+      `https://listing-service.qac24svc.dev/v1/vehicle?${url}&sf=city:DU_DUBAI&size=25&spath=buy-used-cars-dubai&variant=filterV3&page=${page}`,
       { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
     ).then((resp) => {
       if (page === 0) {
@@ -67,7 +75,7 @@ const DisplayCars = () => {
       "https://listing-service.qac24svc.dev/v1/filter?&variant=filterV3",
       { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
     ).then((response) => {
-      // console.log(response.data.filters);
+      // console.log(response);
       const result = arr.map((ele) => {
         return response.data.filters[ele];
       });
@@ -76,10 +84,17 @@ const DisplayCars = () => {
     });
   };
 
-  // console.log(filters);
+  //size_zero_api_call
+  const size_zero_filter_call = (url) => {
+    Axios.get(
+      `https://listing-service.qac24svc.dev/v1/vehicle?${url}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
+      { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
+    ).then((response) => {
+      setCount(response.data.total);
+    });
+  };
 
   const checkBoxUrlHandler = (data) => {
-    // console.log(data);
     if (data.values) {
       let newData = {};
       if (selectedFilter[data.name]) {
@@ -130,8 +145,8 @@ const DisplayCars = () => {
         };
       }
       setSelectedFilter(newData);
-      // console.log(newData);
-      urlStringFunc(newData);
+      const url = urlStringFunc(newData);
+      size_zero_filter_call(url);
     } else {
       let newData = {};
       if (selectedFilter[data.name]) {
@@ -159,7 +174,8 @@ const DisplayCars = () => {
         };
       }
       setSelectedFilter(newData);
-      urlStringFunc(newData);
+      const url = urlStringFunc(newData);
+      size_zero_filter_call(url);
     }
   };
 
@@ -169,14 +185,13 @@ const DisplayCars = () => {
       [data.value.name]: [data.value],
     };
     setSelectedFilter(newData);
-    urlStringFunc(newData);
+    const url = urlStringFunc(newData);
+    size_zero_filter_call(url);
   };
 
   const modelCheckBoxUrlHandler = (data) => {
-    // console.log(data);
     let newData = {};
     if (selectedFilter[data.name]) {
-      // console.log(selectedFilter[data.name]);
       const filtered = selectedFilter[data.name].find(
         (it) => it.name === data.values[0].name
       );
@@ -184,7 +199,6 @@ const DisplayCars = () => {
         let included = selectedFilter[data.name].find((it) =>
           it.models.includes(data.values[0].models[0])
         );
-
         if (included) {
           newData = {
             ...selectedFilter,
@@ -197,18 +211,18 @@ const DisplayCars = () => {
               };
             }),
           };
-          if (
-            newData[data.name].filter((it, index) => {
-              if (it.models.length === 0) {
-                return newData[data.name].splice(index, 1);
-              } else {
-                return it;
-              }
-            })
-          )
-            if (newData[data.name].length === 0) {
-              delete newData[data.name];
+
+          newData[data.name].filter((it, index) => {
+            if (it.models.length === 0) {
+              return newData[data.name].splice(index, 1);
+            } else {
+              return it;
             }
+          });
+
+          if (newData[data.name].length === 0) {
+            delete newData[data.name];
+          }
         } else {
           newData = {
             ...selectedFilter,
@@ -237,8 +251,61 @@ const DisplayCars = () => {
       };
     }
     setSelectedFilter(newData);
-    // console.log(newData);
-    urlStringFunc(newData);
+    const url = urlStringFunc(newData);
+    size_zero_filter_call(url);
+  };
+
+  const clear_selected_model = (key, modelName) => {
+    let newData = {
+      ...selectedFilter,
+      [key]: selectedFilter[key].map((it) => {
+        return {
+          ...it,
+          models: it.models.filter((model) => model !== modelName),
+        };
+      }),
+    };
+
+    newData[key].filter((it, index) => {
+      if (it.models.length === 0) {
+        return newData[key].splice(index, 1);
+      } else {
+        return it;
+      }
+    });
+
+    if (newData[key].length === 0) {
+      delete newData[key];
+    }
+    console.log(newData);
+    usedCarsData(0, newData);
+  };
+
+  const clear_selected_type = (key, val) => {
+    let newData = {};
+    let selected = selectedFilter[key].filter((it) => it !== val);
+    newData = {
+      ...selectedFilter,
+      [key]: selected,
+    };
+    if (selected.length === 0) {
+      delete newData[key];
+    }
+    usedCarsData(0, newData);
+  };
+
+  const clear_selected_priceKmYear = (key) => {
+    let newData = {
+      ...selectedFilter,
+    };
+    delete newData[key];
+    usedCarsData(0, newData);
+  };
+
+  const clear_All_filters = () => {
+    let newData = { ...selectedFilter };
+    Object.keys(selectedFilter).map((filter) => delete newData[filter]);
+    usedCarsData(0, newData);
   };
 
   const urlStringFunc = (newData) => {
@@ -267,7 +334,6 @@ const DisplayCars = () => {
         key === "odometerReading"
       ) {
         newData[key].forEach((value) => {
-          // console.log(value);
           let filterType = value.filterType;
           let name = value.name;
           let min = value.min;
@@ -303,17 +369,8 @@ const DisplayCars = () => {
         }
       }
     });
-    // console.log(urlString);
-    setFilterUrl(urlString);
-    Axios.get(
-      `https://listing-service.qac24svc.dev/v1/vehicle?${urlString}&sf=city:DU_DUBAI&size=0&page=0&variant=filterV3`,
-      { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
-    ).then((response) => {
-      setCount(response.data.total);
-    });
+    return urlString;
   };
-  // console.log(selectedFilter);
-  // console.log(filterUrl);
 
   useEffect(() => {
     filterData();
@@ -328,7 +385,13 @@ const DisplayCars = () => {
     setFiltersCompOpen(false);
   };
 
-  // console.log(selectedFilter);
+  const remove_filters_selected_in_clear_model = (data) => {
+    let newData = { ...selectedFilter };
+    data.map((filter) => delete newData[filter.name]);
+    setSelectedFilter(newData);
+    const url = urlStringFunc(newData);
+    size_zero_filter_call(url);
+  };
 
   return (
     <div className={classes.container}>
@@ -346,6 +409,124 @@ const DisplayCars = () => {
             </div>
           );
         })}
+      </div>
+
+      <div>
+        {Object.keys(selectedFilter).length > 0 && (
+          <div className={classes.selected_options}>
+            <div className={classes.clear_All_otn}>
+              <h5 onClick={clear_All_filters}>Clear All</h5>
+            </div>
+            <div className={classes.selected_filter_items}>
+              {Object.keys(selectedFilter).length > 0 &&
+                Object.keys(selectedFilter).map((key) => {
+                  if (key === "make") {
+                    return selectedFilter[key].map((val) =>
+                      val.models.map((model) => {
+                        return (
+                          <div key={model} className={classes.filter_item}>
+                            <p>
+                              {`${val.name} ${model}`}{" "}
+                              <span>
+                                <img
+                                  onClick={() =>
+                                    clear_selected_model(key, model)
+                                  }
+                                  src="https://consumer-web-ae.qac24svc.dev/ae/static/js/6a6d198249093bff9ae2c18dd52f9d2e.svg"
+                                  alt="Close"
+                                />
+                              </span>
+                            </p>
+                          </div>
+                        );
+                      })
+                    );
+                  }
+                  if (key === "quotedPrice") {
+                    return (
+                      <div
+                        key={selectedFilter[key][0].price}
+                        className={classes.filter_item}
+                      >
+                        <p>
+                          {`AED ${selectedFilter[key][0].min} - AED ${selectedFilter[key][0].max}`}{" "}
+                          <span>
+                            <img
+                              onClick={() => clear_selected_priceKmYear(key)}
+                              src="https://consumer-web-ae.qac24svc.dev/ae/static/js/6a6d198249093bff9ae2c18dd52f9d2e.svg"
+                              alt="Close"
+                            />
+                          </span>
+                        </p>
+                      </div>
+                    );
+                  }
+                  if (key === "year") {
+                    return (
+                      <div
+                        key={selectedFilter[key][0].price}
+                        className={classes.filter_item}
+                      >
+                        <p>
+                          {selectedFilter[key][0].price}{" "}
+                          <span>
+                            <img
+                              onClick={() => clear_selected_priceKmYear(key)}
+                              src="https://consumer-web-ae.qac24svc.dev/ae/static/js/6a6d198249093bff9ae2c18dd52f9d2e.svg"
+                              alt="Close"
+                            />
+                          </span>
+                        </p>
+                      </div>
+                    );
+                  }
+                  if (key === "odometerReading") {
+                    return (
+                      <div
+                        key={selectedFilter[key][0].price}
+                        className={classes.filter_item}
+                      >
+                        <p>
+                          {`${selectedFilter[key][0].min} KMs - ${selectedFilter[key][0].max} KMs`}{" "}
+                          <span>
+                            <img
+                              onClick={() => clear_selected_priceKmYear(key)}
+                              src="https://consumer-web-ae.qac24svc.dev/ae/static/js/6a6d198249093bff9ae2c18dd52f9d2e.svg"
+                              alt="Close"
+                            />
+                          </span>
+                        </p>
+                      </div>
+                    );
+                  }
+                  if (
+                    key === "bodyType" ||
+                    key === "carColor" ||
+                    key === "fuelType" ||
+                    key === "optionsType" ||
+                    key === "transmissionType"
+                  ) {
+                    return selectedFilter[key].map((val) => {
+                      return (
+                        <div key={val} className={classes.filter_item}>
+                          <p>
+                            {val}{" "}
+                            <span>
+                              <img
+                                onClick={() => clear_selected_type(key, val)}
+                                src="https://consumer-web-ae.qac24svc.dev/ae/static/js/6a6d198249093bff9ae2c18dd52f9d2e.svg"
+                                alt="Close"
+                              />
+                            </span>
+                          </p>
+                        </div>
+                      );
+                    });
+                  }
+                })}
+            </div>
+          </div>
+        )}
       </div>
       <div className={classes.headers}>
         <h3>Used Cars in Dubai</h3>
@@ -369,6 +550,9 @@ const DisplayCars = () => {
           count={count}
           usedCarsData={() => usedCarsData(0)}
           urlStringFunc={urlStringFunc}
+          remove_filters_selected_in_clear_model={
+            remove_filters_selected_in_clear_model
+          }
         />
       </Modal>
 

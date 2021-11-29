@@ -181,20 +181,25 @@ const Filters = (props) => {
   };
 
   const unSelectFilters = (selected) => {
-    let clearRemainFilters = clearSelectedFilter.filter(
-      (it) => it.displayName !== selected.displayName
+    let filter_name;
+    let unselect = clearSelectedFilter.find(
+      (filter) => filter.displayName === selected.displayName
     );
-    setClearSelectedFilter(clearRemainFilters);
+    if (unselect) {
+      filter_name = clearSelectedFilter.filter(
+        (it) => it.displayName !== selected.displayName
+      );
+    } else {
+      filter_name = [...clearSelectedFilter, selected];
+    }
+
+    setClearSelectedFilter(filter_name);
   };
 
   const removeSelectedFilters = () => {
     setClear_Filters_Modal(false);
-    clearSelectedFilter.map(
-      (filter) => delete props.selectedFilter[filter.name]
-    );
-    props.urlStringFunc(props.selectedFilter);
+    props.remove_filters_selected_in_clear_model(clearSelectedFilter);
   };
-  // console.log(props.selectedFilter);
 
   return (
     <div className={classes.filter_modal_ui}>
@@ -254,11 +259,11 @@ const Filters = (props) => {
               filterType === "sf" &&
               suggestionData.map((suggestion) => {
                 return (
-                  <div key={suggestion.name}>
+                  <div key={`${suggestion.name}+sf`}>
                     {suggestion.subFacet.buckets.map((model) => {
                       return (
                         <div
-                          key={model.name}
+                          key={`${model.name}+sf`}
                           className={classes.checkBox_design}
                         >
                           <input
@@ -395,14 +400,14 @@ const Filters = (props) => {
             {selectedFiltersArraya &&
               selectedFiltersArraya.map((selected, index) => {
                 return (
-                  <div className={classes.checkBox_design}>
+                  <div
+                    className={classes.checkBox_design}
+                    key={selected.displayName}
+                  >
                     <input
                       type="checkbox"
                       id={selected.displayName}
                       onChange={() => unSelectFilters(selected, index)}
-                      // checked={clearSelectedFilter.find(
-                      //   (it) => it.displayName === selected.displayName
-                      // )}
                       checked={clear_check_status(selected)}
                     />
                     <label
