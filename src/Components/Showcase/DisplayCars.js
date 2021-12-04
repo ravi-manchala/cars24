@@ -39,7 +39,18 @@ const DisplayCars = () => {
   // Total number of cars count
   const [count, setCount] = useState();
 
-  // console.log(selectedFilter);
+  // filters-page state
+  // option name ex: make, bodytype, etc
+  const [optionName, setOptionName] = useState("");
+
+  //filterType ex: sf, rf
+  const [filterType, setFilterType] = useState("");
+
+  //filter-page suggestions data
+  const [suggestionData, setSuggestionsData] = useState();
+
+  //filters-page bucket data
+  const [bucketData, setBucketData] = useState();
 
   //Used cars data API call
   const usedCarsData = (page, newFiltes = null) => {
@@ -75,7 +86,6 @@ const DisplayCars = () => {
       "https://listing-service.qac24svc.dev/v1/filter?&variant=filterV3",
       { headers: { X_COUNTRY: "AE", X_VEHICLE_TYPE: "CAR" } }
     ).then((response) => {
-      // console.log(response);
       const result = arr.map((ele) => {
         return response.data.filters[ele];
       });
@@ -277,7 +287,6 @@ const DisplayCars = () => {
     if (newData[key].length === 0) {
       delete newData[key];
     }
-    console.log(newData);
     usedCarsData(0, newData);
   };
 
@@ -377,12 +386,20 @@ const DisplayCars = () => {
     usedCarsData(0);
   }, []);
 
-  const filter_modal_Open = () => {
+  const filter_modal_Open = (index) => {
     setFiltersCompOpen(true);
+    optionsData(index);
   };
 
   const filter_modal_Close = () => {
     setFiltersCompOpen(false);
+  };
+
+  const optionsData = (index) => {
+    setOptionName(filters[index].name);
+    setFilterType(filters[index].filterType);
+    setSuggestionsData(filters[index].suggestions);
+    setBucketData(filters[index].buckets);
   };
 
   const remove_filters_selected_in_clear_model = (data) => {
@@ -395,11 +412,11 @@ const DisplayCars = () => {
 
   return (
     <div className={classes.container}>
-      <div className={classes.options} style={{ height: "60px" }}>
-        {filters.map((option) => {
+      <div className={classes.options}>
+        {filters.map((option, index) => {
           return (
             <div key={option.name} className={classes.optionBtn}>
-              <p onClick={filter_modal_Open}>
+              <p onClick={() => filter_modal_Open(index)}>
                 <span>{option.displayName}</span>
                 <img
                   src="https://consumer-web-ae.qac24svc.dev/ae/static/js/6fae39b71885d4edcd60fe0f00851390.svg"
@@ -542,6 +559,11 @@ const DisplayCars = () => {
       >
         <Filters
           filters={filters}
+          optionName={optionName}
+          filterType={filterType}
+          suggestionData={suggestionData}
+          bucketData={bucketData}
+          optionsData={optionsData}
           filter_modal_Close={filter_modal_Close}
           suggestionsUrlHandler={suggestionsUrlHandler}
           checkBoxUrlHandler={checkBoxUrlHandler}

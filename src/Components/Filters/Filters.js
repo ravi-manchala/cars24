@@ -3,24 +3,18 @@ import classes from "./Filters.module.css";
 import Modal from "react-modal";
 
 const Filters = (props) => {
-  const { filters, filter_modal_Close } = props;
-  // console.log(props.selectedFilter);
-  // console.log(Object.keys(props.selectedFilter));
-  // console.log(filters);
+  const {
+    filters,
+    filter_modal_Close,
+    optionName,
+    filterType,
+    suggestionData,
+    bucketData,
+    optionsData,
+  } = props;
 
-  const [optionName, setOptionName] = useState("");
-  const [filterType, setFilterType] = useState("");
-  const [suggestionData, setSuggestionsData] = useState();
-  const [bucketData, setBucketData] = useState();
   const [clear_Filters_Modal, setClear_Filters_Modal] = useState(false);
   const [clearSelectedFilter, setClearSelectedFilter] = useState([]);
-
-  const optionsData = (index) => {
-    setOptionName(filters[index].name);
-    setFilterType(filters[index].filterType);
-    setSuggestionsData(filters[index].suggestions);
-    setBucketData(filters[index].buckets);
-  };
 
   // console.log(filters);
   // console.log(filterType);
@@ -215,7 +209,14 @@ const Filters = (props) => {
         <div className={classes.options}>
           {filters.map((option, index) => {
             return (
-              <div key={option.name} className={classes.optionBtn}>
+              <div
+                key={option.name}
+                className={
+                  filters[index].name === optionName
+                    ? `${classes.optionBtn} ${classes.optionBtn_active}`
+                    : `${classes.optionBtn} ${classes.optionBtn_inactive}`
+                }
+              >
                 <p onClick={() => optionsData(index)}>{option.displayName}</p>
               </div>
             );
